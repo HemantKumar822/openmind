@@ -164,15 +164,17 @@ const Index = () => {
         onThemeToggle={handleThemeToggle}
       />
       
-      <main className="flex-1 flex flex-col">
+      {/* Chat area with fixed height and scrolling */}
+      <main className="flex-1 flex flex-col min-h-0">
         {!hasMessages ? (
           <WelcomeScreen />
         ) : (
           <div
             ref={chatContainerRef}
-            className="flex-1 overflow-y-auto p-4 sm:p-6"
+            className="flex-1 overflow-y-auto p-4 sm:p-6 pb-0"
+            style={{ height: 'calc(100vh - 140px)' }}
           >
-            <div className="container mx-auto max-w-4xl">
+            <div className="container mx-auto max-w-4xl pb-4">
               {currentChat?.messages.map((message) => (
                 <ChatMessage key={message.id} message={message} />
               ))}
@@ -203,11 +205,14 @@ const Index = () => {
         )}
       </main>
 
-      <ChatInput
-        onSendMessage={handleSendMessage}
-        disabled={isLoading}
-        placeholder={hasMessages ? "Continue the conversation..." : "Start your conversation with LUMI..."}
-      />
+      {/* Fixed chat input at bottom */}
+      <div className="sticky bottom-0 z-10">
+        <ChatInput
+          onSendMessage={handleSendMessage}
+          disabled={isLoading}
+          placeholder={hasMessages ? "Continue the conversation..." : "Start your conversation with LUMI..."}
+        />
+      </div>
     </div>
   );
 };

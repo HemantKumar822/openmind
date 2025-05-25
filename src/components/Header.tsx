@@ -152,60 +152,62 @@ export const Header = ({ selectedModel, onModelChange, onNewChat, theme, onTheme
           </div>
         </div>
 
-        {/* Mobile menu */}
+        {/* Mobile menu with improved design */}
         {isMobileMenuOpen && (
-          <div className="sm:hidden mt-3 pt-3 border-t border-lumi-border space-y-3">
-            {/* Mobile Model Selector */}
-            <div>
-              <Label className="text-xs text-lumi-secondary">Model</Label>
-              <Select value={selectedModel} onValueChange={onModelChange}>
-                <SelectTrigger className="w-full mt-1">
-                  <SelectValue placeholder="Select a model" />
-                </SelectTrigger>
-                <SelectContent className="z-50 bg-background border border-lumi-border">
-                  {AVAILABLE_MODELS.map((model) => (
-                    <SelectItem key={model.id} value={model.id} className="cursor-pointer">
-                      <div className="flex flex-col">
-                        <span className="font-medium text-sm">{model.name}</span>
-                        <span className="text-xs text-lumi-secondary">{model.guidance}</span>
-                      </div>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+          <div className="sm:hidden mt-4 pt-4 border-t border-lumi-border/30 animate-fade-in">
+            <div className="space-y-4 bg-white dark:bg-lumi-surface rounded-xl p-4 shadow-lg border border-lumi-border/20">
+              {/* Mobile Model Selector */}
+              <div className="space-y-2">
+                <Label className="text-sm font-medium text-lumi-primary">Select Model</Label>
+                <Select value={selectedModel} onValueChange={onModelChange}>
+                  <SelectTrigger className="w-full bg-background border border-lumi-border/50 rounded-lg">
+                    <SelectValue placeholder="Select a model" />
+                  </SelectTrigger>
+                  <SelectContent className="z-50 bg-background border border-lumi-border">
+                    {AVAILABLE_MODELS.map((model) => (
+                      <SelectItem key={model.id} value={model.id} className="cursor-pointer">
+                        <div className="flex flex-col">
+                          <span className="font-medium text-sm">{model.name}</span>
+                          <span className="text-xs text-lumi-secondary">{model.guidance}</span>
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
 
-            {/* Mobile action buttons */}
-            <div className="flex justify-around pb-2">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => { onNewChat(); setIsMobileMenuOpen(false); }}
-                className="flex items-center gap-2"
-              >
-                <MessageSquarePlus className="h-4 w-4" />
-                New Chat
-              </Button>
+              {/* Mobile action buttons with improved layout */}
+              <div className="grid grid-cols-3 gap-3">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => { onNewChat(); setIsMobileMenuOpen(false); }}
+                  className="flex flex-col items-center gap-1 h-auto py-3 border-lumi-border/50 hover:bg-lumi-surface"
+                >
+                  <MessageSquarePlus className="h-4 w-4" />
+                  <span className="text-xs">New Chat</span>
+                </Button>
 
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => { setIsApiKeyDialogOpen(true); setIsMobileMenuOpen(false); }}
-                className="flex items-center gap-2"
-              >
-                <Key className="h-4 w-4" />
-                API Key
-              </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => { setIsApiKeyDialogOpen(true); setIsMobileMenuOpen(false); }}
+                  className="flex flex-col items-center gap-1 h-auto py-3 border-lumi-border/50 hover:bg-lumi-surface"
+                >
+                  <Key className="h-4 w-4" />
+                  <span className="text-xs">API Key</span>
+                </Button>
 
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => { onThemeToggle(); setIsMobileMenuOpen(false); }}
-                className="flex items-center gap-2"
-              >
-                {theme === 'light' ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
-                Theme
-              </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => { onThemeToggle(); setIsMobileMenuOpen(false); }}
+                  className="flex flex-col items-center gap-1 h-auto py-3 border-lumi-border/50 hover:bg-lumi-surface"
+                >
+                  {theme === 'light' ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
+                  <span className="text-xs">Theme</span>
+                </Button>
+              </div>
             </div>
           </div>
         )}
