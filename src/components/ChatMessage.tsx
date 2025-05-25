@@ -45,7 +45,7 @@ export const ChatMessage = ({ message }: ChatMessageProps) => {
                     </code>
                   ) : (
                     <SyntaxHighlighter
-                      style={tomorrow}
+                      style={tomorrow as { [key: string]: React.CSSProperties }}
                       language={match[1]}
                       PreTag="div"
                       className="rounded-md text-sm"
