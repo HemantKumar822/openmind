@@ -169,7 +169,7 @@ const Index = () => {
         ) : (
           <div
             ref={chatContainerRef}
-            className="flex-1 overflow-y-auto p-4"
+            className="flex-1 overflow-y-auto p-3 sm:p-4"
           >
             <div className="container mx-auto max-w-4xl">
               {currentChat?.messages.map((message) => (
@@ -177,12 +177,12 @@ const Index = () => {
               ))}
               {isLoading && (
                 <div className="flex justify-start mb-4">
-                  <div className="message-assistant border rounded-lg p-4 max-w-[80%]">
+                  <div className="message-assistant border rounded-lg p-3 sm:p-4 max-w-[85%] sm:max-w-[80%]">
                     <div className="flex items-center gap-2 mb-2">
-                      <div className="w-6 h-6 rounded-full lumi-gradient flex items-center justify-center">
+                      <div className="w-5 h-5 rounded-full lumi-gradient flex items-center justify-center">
                         <span className="text-white font-bold text-xs">L</span>
                       </div>
-                      <span className="text-sm font-medium text-lumi-primary">
+                      <span className="text-xs sm:text-sm font-medium text-lumi-primary">
                         {AVAILABLE_MODELS.find(m => m.id === selectedModel)?.name}
                       </span>
                     </div>
@@ -192,7 +192,7 @@ const Index = () => {
                         <div className="w-2 h-2 bg-lumi-accent rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
                         <div className="w-2 h-2 bg-lumi-accent rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
                       </div>
-                      <span className="text-sm text-lumi-secondary">Thinking...</span>
+                      <span className="text-xs sm:text-sm text-lumi-secondary">Thinking...</span>
                     </div>
                   </div>
                 </div>

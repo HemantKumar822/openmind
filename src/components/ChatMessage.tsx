@@ -15,42 +15,44 @@ export const ChatMessage = ({ message }: ChatMessageProps) => {
 
   return (
     <div className={`flex ${isUser ? 'justify-end' : 'justify-start'} mb-4 animate-fade-in`}>
-      <div className={`max-w-[80%] rounded-lg p-4 ${
+      <div className={`max-w-[85%] sm:max-w-[80%] rounded-lg p-3 sm:p-4 ${
         isUser 
           ? 'message-user border text-right' 
           : 'message-assistant border'
       }`}>
         {!isUser && model && (
           <div className="flex items-center gap-2 mb-2 pb-2 border-b border-lumi-border">
-            <div className="w-6 h-6 rounded-full lumi-gradient flex items-center justify-center">
+            <div className="w-5 h-5 rounded-full lumi-gradient flex items-center justify-center">
               <span className="text-white font-bold text-xs">L</span>
             </div>
-            <span className="text-sm font-medium text-lumi-primary">{model.name}</span>
+            <span className="text-xs sm:text-sm font-medium text-lumi-primary">{model.name}</span>
           </div>
         )}
         
         <div className="prose prose-sm max-w-none dark:prose-invert">
           {isUser ? (
-            <p className="text-foreground m-0">{message.content}</p>
+            <p className="text-foreground m-0 text-sm sm:text-base">{message.content}</p>
           ) : (
             <ReactMarkdown
               components={{
-                code({ node, inline, className, children, ...props }) {
+                code({ className, children, ...props }) {
                   const match = /language-(\w+)/.exec(className || '');
-                  return !inline && match ? (
+                  const isInline = !match;
+                  
+                  return isInline ? (
+                    <code className="bg-lumi-surface px-1 py-0.5 rounded text-sm" {...props}>
+                      {children}
+                    </code>
+                  ) : (
                     <SyntaxHighlighter
                       style={tomorrow}
                       language={match[1]}
                       PreTag="div"
-                      className="rounded-md"
+                      className="rounded-md text-sm"
                       {...props}
                     >
                       {String(children).replace(/\n$/, '')}
                     </SyntaxHighlighter>
-                  ) : (
-                    <code className="bg-lumi-surface px-1 py-0.5 rounded text-sm" {...props}>
-                      {children}
-                    </code>
                   );
                 },
               }}
