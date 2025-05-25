@@ -12,7 +12,7 @@ import { useToast } from '@/hooks/use-toast';
 const Index = () => {
   const [theme, setTheme] = useState<'light' | 'dark'>(storageUtils.getTheme());
   const [selectedModel, setSelectedModel] = useState<string>(
-    storageUtils.getSelectedModel() || AVAILABLE_MODELS[1].id // Default to Llama 3.3
+    storageUtils.getSelectedModel() || AVAILABLE_MODELS[1].id
   );
   const [currentChat, setCurrentChat] = useState<ChatSession | null>(
     storageUtils.getCurrentChat()
@@ -44,10 +44,13 @@ const Index = () => {
     }
   }, [currentChat]);
 
-  // Auto-scroll to bottom
+  // Auto-scroll to bottom with smooth animation
   useEffect(() => {
     if (chatContainerRef.current) {
-      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+      chatContainerRef.current.scrollTo({
+        top: chatContainerRef.current.scrollHeight,
+        behavior: 'smooth'
+      });
     }
   }, [currentChat?.messages]);
 
@@ -57,7 +60,6 @@ const Index = () => {
 
   const handleModelChange = (modelId: string) => {
     setSelectedModel(modelId);
-    // If we have an active chat and model changes, start a new chat
     if (currentChat && currentChat.messages.length > 0) {
       handleNewChat();
     }
@@ -111,7 +113,6 @@ const Index = () => {
       const client = new OpenRouterClient(apiKey);
       const selectedModelData = AVAILABLE_MODELS.find(m => m.id === selectedModel);
       
-      // Convert chat messages to OpenRouter format
       const openRouterMessages = updatedChat.messages.map(msg => ({
         role: msg.role as 'user' | 'assistant',
         content: msg.content
@@ -154,7 +155,7 @@ const Index = () => {
   const hasMessages = currentChat?.messages?.length > 0;
 
   return (
-    <div className="min-h-screen flex flex-col bg-background w-full">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-background to-lumi-surface/30 w-full">
       <Header
         selectedModel={selectedModel}
         onModelChange={handleModelChange}
@@ -169,30 +170,30 @@ const Index = () => {
         ) : (
           <div
             ref={chatContainerRef}
-            className="flex-1 overflow-y-auto p-3 sm:p-4"
+            className="flex-1 overflow-y-auto p-4 sm:p-6"
           >
             <div className="container mx-auto max-w-4xl">
               {currentChat?.messages.map((message) => (
                 <ChatMessage key={message.id} message={message} />
               ))}
               {isLoading && (
-                <div className="flex justify-start mb-4">
-                  <div className="message-assistant border rounded-lg p-3 sm:p-4 max-w-[85%] sm:max-w-[80%]">
-                    <div className="flex items-center gap-2 mb-2">
-                      <div className="w-5 h-5 rounded-full lumi-gradient flex items-center justify-center">
+                <div className="flex justify-start mb-6">
+                  <div className="bg-white dark:bg-lumi-surface border border-lumi-border/50 rounded-2xl p-4 sm:p-5 max-w-[90%] sm:max-w-[85%] shadow-sm">
+                    <div className="flex items-center gap-2 mb-3">
+                      <div className="w-6 h-6 rounded-full lumi-gradient flex items-center justify-center">
                         <span className="text-white font-bold text-xs">L</span>
                       </div>
-                      <span className="text-xs sm:text-sm font-medium text-lumi-primary">
+                      <span className="text-sm font-medium text-lumi-primary">
                         {AVAILABLE_MODELS.find(m => m.id === selectedModel)?.name}
                       </span>
                     </div>
-                    <div className="flex items-center space-x-2">
+                    <div className="flex items-center space-x-3">
                       <div className="flex space-x-1">
                         <div className="w-2 h-2 bg-lumi-accent rounded-full animate-bounce"></div>
                         <div className="w-2 h-2 bg-lumi-accent rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
                         <div className="w-2 h-2 bg-lumi-accent rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
                       </div>
-                      <span className="text-xs sm:text-sm text-lumi-secondary">Thinking...</span>
+                      <span className="text-sm text-lumi-secondary">Thinking...</span>
                     </div>
                   </div>
                 </div>
