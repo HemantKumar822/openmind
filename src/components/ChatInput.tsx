@@ -67,6 +67,7 @@ export const ChatInput = ({ onSendMessage, disabled = false, placeholder = "Type
           <button
             onClick={handleSend}
             disabled={disabled || !message.trim()}
+            aria-label="Send message"
             className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-full focus:outline-none disabled:opacity-50"
           >
             {disabled ? (

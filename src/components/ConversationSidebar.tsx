@@ -2,14 +2,7 @@ import { useState, useEffect } from 'react';
 import { X, MessageSquare, Trash2, Pin, Pencil, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import { storageUtils } from '@/lib/storage';
-
-export interface Conversation {
-  id: string;
-  title: string;
-  timestamp: number;
-  isPinned?: boolean;
-}
+import { storageUtils, Conversation } from '@/lib/storage';
 
 interface ConversationSidebarProps {
   isOpen: boolean;
@@ -34,21 +27,19 @@ export const ConversationSidebar = ({
   // Load conversations from chat history
   useEffect(() => {
     try {
-      const chatHistory = storageUtils.getChatHistory();
-      // Only include chats that have messages
-      const validConversations = chatHistory
-        .filter(chat => chat?.messages?.length > 0)
-        .map(chat => ({
-          id: chat.id,
-          title: chat.title || 'New Chat',
-          timestamp: chat.updatedAt || chat.createdAt || Date.now(),
-          isPinned: false
+      const loadedConversations = storageUtils.getConversations();
+      // Ensure conversations have default isPinned if not set
+      const validConversations = loadedConversations
+        .map(conv => ({
+          ...conv,
+          isPinned: conv.isPinned || false, 
+          // Fallback for timestamp if missing, though unlikely with current storage logic
+          timestamp: conv.timestamp || Date.now() 
         }))
-        .sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0)); // Sort by most recent
+        .sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
       
       setConversations(validConversations);
     } catch (e) {
-      console.error('Failed to load conversations', e);
       setConversations([]);
     }
   }, [currentConversationId]); // Refresh when current conversation changes
@@ -73,7 +64,6 @@ export const ConversationSidebar = ({
         description: "The conversation has been removed from your history.",
       });
     } catch (error) {
-      console.error('Error deleting conversation:', error);
       toast({
         title: "Error",
         description: "Failed to delete the conversation. Please try again.",
@@ -84,9 +74,20 @@ export const ConversationSidebar = ({
 
   const handlePin = (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    setConversations(conversations.map(conv => 
-      conv.id === id ? { ...conv, isPinned: !conv.isPinned } : conv
-    ));
+    const conversation = conversations.find(conv => conv.id === id);
+    if (conversation) {
+      const newPinnedStatus = !conversation.isPinned;
+      storageUtils.setConversationPinnedStatus(id, newPinnedStatus);
+      setConversations(prev => 
+        prev.map(conv => 
+          conv.id === id ? { ...conv, isPinned: newPinnedStatus } : conv
+        )
+      );
+      toast({
+        title: newPinnedStatus ? "Conversation Pinned" : "Conversation Unpinned",
+        description: `The conversation has been ${newPinnedStatus ? 'pinned' : 'unpinned'}.`,
+      });
+    }
   };
 
   const startEditing = (conversation: Conversation, e: React.MouseEvent) => {
@@ -107,12 +108,18 @@ export const ConversationSidebar = ({
     }
     
     // Update local state
-    setConversations(conversations.map(conv => 
-      conv.id === editingId ? { ...conv, title: editTitle.trim() } : conv
-    ));
+    setConversations(prev => 
+      prev.map(conv => 
+        conv.id === editingId ? { ...conv, title: editTitle.trim() } : conv
+      )
+    );
     
     setEditingId(null);
     setEditTitle('');
+    toast({
+      title: "Conversation Renamed",
+      description: "The conversation title has been updated.",
+    });
   };
 
   const sortedConversations = [...conversations].sort((a, b) => {
@@ -223,6 +230,7 @@ export const ConversationSidebar = ({
                         }}
                         className="p-1.5 rounded hover:bg-gray-200/70 dark:hover:bg-gray-600/50 transition-colors"
                         title={conversation.isPinned ? 'Unpin' : 'Pin to top'}
+                        aria-label={conversation.isPinned ? 'Unpin conversation' : 'Pin conversation'}
                       >
                         <Pin
                           className={`h-3.5 w-3.5 ${
@@ -236,6 +244,7 @@ export const ConversationSidebar = ({
                         onClick={(e) => startEditing(conversation, e)}
                         className="p-1.5 rounded hover:bg-gray-200/70 dark:hover:bg-gray-600/50 transition-colors"
                         title="Rename"
+                        aria-label="Rename conversation"
                       >
                         <Pencil className="h-3.5 w-3.5 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 transition-colors" />
                       </button>
@@ -243,6 +252,7 @@ export const ConversationSidebar = ({
                         onClick={(e) => handleDelete(conversation.id, e)}
                         className="p-1 rounded hover:bg-lumi-surface/70 text-red-500 hover:text-red-600"
                         title="Delete"
+                        aria-label="Delete conversation"
                       >
                         <Trash2 className="h-3.5 w-3.5" />
                       </button>
@@ -280,40 +290,4 @@ export const ConversationSidebar = ({
       </aside>
     </>
   );
-};
-
-export const addConversation = (conversation: Omit<Conversation, 'isPinned'>) => {
-  const saved = localStorage.getItem('lumi-conversations');
-  let conversations: Conversation[] = [];
-  
-  if (saved) {
-    try {
-      conversations = JSON.parse(saved);
-    } catch (e) {
-      console.error('Failed to parse conversations', e);
-    }
-  }
-  
-  // Update or add conversation
-  const existingIndex = conversations.findIndex(c => c.id === conversation.id);
-  if (existingIndex >= 0) {
-    conversations[existingIndex] = { ...conversations[existingIndex], ...conversation };
-  } else {
-    conversations.unshift({ ...conversation, isPinned: false });
-  }
-  
-  localStorage.setItem('lumi-conversations', JSON.stringify(conversations));
-};
-
-export const getConversation = (id: string): Conversation | undefined => {
-  const saved = localStorage.getItem('lumi-conversations');
-  if (!saved) return undefined;
-  
-  try {
-    const conversations: Conversation[] = JSON.parse(saved);
-    return conversations.find(c => c.id === id);
-  } catch (e) {
-    console.error('Failed to parse conversations', e);
-    return undefined;
-  }
 };

@@ -20,28 +20,21 @@ function ChatMessageComponent({ message }: ChatMessageProps) {
   const content = message.content || '';
 
   const processedContent = useMemo(() => {
-    // Pre-process content to ensure proper markdown formatting
-    return content
-      // Ensure code blocks have proper newlines
-      .replace(/```(\w*)\n([\s\S]*?)\n```/g, (match, lang, code) => {
-        return `\n\`\`\`${lang}\n${code.trim()}\n\`\`\`\n`;
-      })
-      // Ensure lists have proper spacing
-      .replace(/(\n\s*[-*+]\s+[^\n]+)/g, '\n$1\n')
-      // Fix numbered lists
-      .replace(/(\n\s*\d+\.\s+[^\n]+)/g, '\n$1\n');
+    // Pre-processing is removed as remark-gfm should handle standard cases.
+    // If specific formatting issues from AI output persist,
+    // consider targeted remark/rehype plugins or minimal necessary preprocessing.
+    return content;
   }, [content]);
 
   const renderMarkdown = () => {
     const components: Components = {
-      code({ node, className, children, ...props }: { node?: any; className?: string; children?: React.ReactNode; [key: string]: any }) {
+      code({ node, className, children, inline, ...props }: ComponentPropsWithoutRef<'code'> & { inline?: boolean; node?: any }) {
         const match = /language-(\w+)/.exec(className || '');
-        const isInline = !className?.includes('language-');
         
-        if (isInline) {
+        if (inline || !match) { // Treat as inline if no language match or explicitly inline
           return (
             <code 
-              className="bg-lumi-accent/10 text-lumi-accent px-1.5 py-0.5 rounded text-sm font-mono break-words"
+              className={cn("bg-lumi-accent/10 text-lumi-accent px-1.5 py-0.5 rounded text-sm font-mono break-words", className)}
               {...props}
             >
               {children}
@@ -49,7 +42,7 @@ function ChatMessageComponent({ message }: ChatMessageProps) {
           );
         }
 
-        const language = match?.[1] || 'text';
+        const language = match[1];
         const codeContent = String(children).replace(/\n$/, '');
         
         return (
@@ -62,38 +55,30 @@ function ChatMessageComponent({ message }: ChatMessageProps) {
           </div>
         );
       },
-      pre: ({ node, children, ...props }: { node?: any; children?: React.ReactNode; [key: string]: any }) => (
-        <div className="my-4" {...props}>
-          {children}
-        </div>
+      pre: (props: ComponentPropsWithoutRef<'pre'>) => (
+        <div className="my-4" {...props} />
       ),
-      p: ({ node, children, ...props }: { node?: any; children?: React.ReactNode; [key: string]: any }) => {
+      p: (props: ComponentPropsWithoutRef<'p'>) => {
         // Skip rendering empty paragraphs
-        if (!children || (Array.isArray(children) && children.every(child => !child || child === '\n'))) {
+        if (!props.children || (Array.isArray(props.children) && props.children.every(child => !child || child === '\n'))) {
           return null;
         }
         return (
-          <p className="text-foreground leading-relaxed text-sm sm:text-[15px] my-3 first:mt-0 last:mb-0" {...props}>
-            {children}
-          </p>
+          <p className="text-foreground leading-relaxed text-sm sm:text-[15px] my-3 first:mt-0 last:mb-0" {...props} />
         );
       },
-      ul: ({ node, children, ...props }: { node?: any; children?: React.ReactNode; [key: string]: any }) => (
-        <ul className="list-disc list-inside space-y-1 my-3 pl-5" {...props}>
-          {children}
-        </ul>
+      ul: (props: ComponentPropsWithoutRef<'ul'>) => (
+        <ul className="list-disc list-inside space-y-1 my-3 pl-5" {...props} />
       ),
-      ol: ({ node, children, ...props }: { node?: any; children?: React.ReactNode; [key: string]: any }) => (
-        <ol className="list-decimal list-inside space-y-1 my-3 pl-5" {...props}>
-          {children}
-        </ol>
+      ol: (props: ComponentPropsWithoutRef<'ol'>) => (
+        <ol className="list-decimal list-inside space-y-1 my-3 pl-5" {...props} />
       ),
-      li: ({ node, children, ...props }: { node?: any; children?: React.ReactNode; [key: string]: any }) => (
-        <li className="pl-1 -ml-1" {...props}>
-          <span className="-ml-1.5">{children}</span>
+      li: (props: ComponentPropsWithoutRef<'li'>) => (
+        <li className="pl-1 -ml-1">
+          <span className="-ml-1.5">{props.children}</span>
         </li>
       ),
-      a: ({ node, ...props }: { node?: any; children?: React.ReactNode; [key: string]: any }) => {
+      a: (props: ComponentPropsWithoutRef<'a'>) => {
         // Ensure href exists and is a string
         const href = typeof props.href === 'string' ? props.href : '#';
         return (
@@ -103,92 +88,62 @@ function ChatMessageComponent({ message }: ChatMessageProps) {
             rel="noopener noreferrer"
             className="text-lumi-accent hover:underline break-words"
             {...props}
-          >
-            {props.children}
-          </a>
+          />
         );
       },
-      blockquote: ({ node, children, ...props }: { node?: any; children?: React.ReactNode; [key: string]: any }) => (
+      blockquote: (props: ComponentPropsWithoutRef<'blockquote'>) => (
         <blockquote
           className="border-l-4 border-lumi-accent/30 pl-4 py-1 my-3 text-lumi-secondary"
           {...props}
-        >
-          {children}
-        </blockquote>
+        />
       ),
-      h1: ({ node, children, ...props }: { node?: any; children?: React.ReactNode; [key: string]: any }) => (
-        <h1 className="text-2xl font-bold my-4" {...props}>
-          {children}
-        </h1>
+      h1: (props: ComponentPropsWithoutRef<'h1'>) => (
+        <h1 className="text-2xl font-bold my-4" {...props} />
       ),
-      h2: ({ node, children, ...props }: { node?: any; children?: React.ReactNode; [key: string]: any }) => (
-        <h2 className="text-xl font-bold my-3" {...props}>
-          {children}
-        </h2>
+      h2: (props: ComponentPropsWithoutRef<'h2'>) => (
+        <h2 className="text-xl font-bold my-3" {...props} />
       ),
-      h3: ({ node, children, ...props }: { node?: any; children?: React.ReactNode; [key: string]: any }) => (
-        <h3 className="text-lg font-semibold my-2" {...props}>
-          {children}
-        </h3>
+      h3: (props: ComponentPropsWithoutRef<'h3'>) => (
+        <h3 className="text-lg font-semibold my-2" {...props} />
       ),
-      h4: ({ node, children, ...props }: { node?: any; children?: React.ReactNode; [key: string]: any }) => (
-        <h4 className="text-base font-medium my-2" {...props}>
-          {children}
-        </h4>
+      h4: (props: ComponentPropsWithoutRef<'h4'>) => (
+        <h4 className="text-base font-medium my-2" {...props} />
       ),
-      hr: () => <hr className="my-4 border-lumi-border/30" />,
-      table: ({ node, children, ...props }: { node?: any; children?: React.ReactNode; [key: string]: any }) => (
-        <div className="overflow-x-auto my-4" {...props}>
-          <table className="min-w-full border-collapse border border-lumi-border/30">
-            {children}
-          </table>
+      hr: (props: ComponentPropsWithoutRef<'hr'>) => <hr className="my-4 border-lumi-border/30" {...props} />,
+      table: (props: ComponentPropsWithoutRef<'table'>) => (
+        <div className="overflow-x-auto my-4">
+          <table className="min-w-full border-collapse border border-lumi-border/30" {...props} />
         </div>
       ),
-      thead: ({ node, children, ...props }: { node?: any; children?: React.ReactNode; [key: string]: any }) => (
-        <thead className="bg-lumi-surface/50 dark:bg-lumi-surface/80" {...props}>
-          {children}
-        </thead>
+      thead: (props: ComponentPropsWithoutRef<'thead'>) => (
+        <thead className="bg-lumi-surface/50 dark:bg-lumi-surface/80" {...props} />
       ),
-      tbody: ({ node, children, ...props }: { node?: any; children?: React.ReactNode; [key: string]: any }) => (
-        <tbody className="divide-y divide-lumi-border/30" {...props}>
-          {children}
-        </tbody>
+      tbody: (props: ComponentPropsWithoutRef<'tbody'>) => (
+        <tbody className="divide-y divide-lumi-border/30" {...props} />
       ),
-      tr: ({ node, children, isHeader, ...props }: { node?: any; children?: React.ReactNode; isHeader?: boolean; [key: string]: any }) => (
-        <tr className={`hover:bg-lumi-surface/30 transition-colors ${isHeader ? 'font-semibold' : ''}`} {...props}>
-          {children}
-        </tr>
+      tr: (props: ComponentPropsWithoutRef<'tr'> & { isHeader?: boolean }) => ( // isHeader is a custom prop from react-markdown
+        <tr className={`hover:bg-lumi-surface/30 transition-colors ${props.isHeader ? 'font-semibold' : ''}`} {...props} />
       ),
-      th: ({ node, children, ...props }: { node?: any; children?: React.ReactNode; [key: string]: any }) => (
+      th: (props: ComponentPropsWithoutRef<'th'>) => (
         <th 
           className="px-4 py-2 text-left text-sm font-medium text-lumi-primary border-b border-lumi-border/30"
           {...props}
-        >
-          {children}
-        </th>
+        />
       ),
-      td: ({ node, children, ...props }: { node?: any; children?: React.ReactNode; [key: string]: any }) => (
+      td: (props: ComponentPropsWithoutRef<'td'>) => (
         <td 
           className="px-4 py-2 text-sm border-b border-lumi-border/20"
           {...props}
-        >
-          {children}
-        </td>
+        />
       ),
-      strong: ({ node, children, ...props }: { node?: any; children?: React.ReactNode; [key: string]: any }) => (
-        <strong className="font-semibold" {...props}>
-          {children}
-        </strong>
+      strong: (props: ComponentPropsWithoutRef<'strong'>) => (
+        <strong className="font-semibold" {...props} />
       ),
-      em: ({ node, children, ...props }: { node?: any; children?: React.ReactNode; [key: string]: any }) => (
-        <em className="italic" {...props}>
-          {children}
-        </em>
+      em: (props: ComponentPropsWithoutRef<'em'>) => (
+        <em className="italic" {...props} />
       ),
-      del: ({ node, children, ...props }: { node?: any; children?: React.ReactNode; [key: string]: any }) => (
-        <del className="line-through text-lumi-secondary" {...props}>
-          {children}
-        </del>
+      del: (props: ComponentPropsWithoutRef<'del'>) => (
+        <del className="line-through text-lumi-secondary" {...props} />
       ),
     };
 
