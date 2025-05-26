@@ -1,93 +1,96 @@
 
 import { MessageCircle, Sparkles, Shield, Zap } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 export const WelcomeScreen = () => {
+  const features = [
+    { 
+      icon: <MessageCircle className="h-5 w-5 text-blue-500 dark:text-blue-400" />, 
+      title: "Smart Conversations", 
+      description: "Natural, context-aware discussions",
+      bg: "bg-blue-500/10"
+    },
+    { 
+      icon: <Sparkles className="h-5 w-5 text-purple-500 dark:text-purple-400" />, 
+      title: "Multiple Models", 
+      description: "Access different AI capabilities",
+      bg: "bg-purple-500/10"
+    },
+    { 
+      icon: <Shield className="h-5 w-5 text-green-500 dark:text-green-400" />, 
+      title: "Private & Secure", 
+      description: "Your data stays protected",
+      bg: "bg-green-500/10"
+    },
+    { 
+      icon: <Zap className="h-5 w-5 text-orange-500 dark:text-orange-400" />, 
+      title: "Lightning Fast", 
+      description: "Quick responses and interactions",
+      bg: "bg-orange-500/10"
+    }
+  ];
+
   return (
-    <div className="flex-1 flex items-center justify-center p-4 sm:p-8">
-      <div className="max-w-lg sm:max-w-2xl text-center space-y-8 sm:space-y-10 animate-fade-in">
-        {/* LUMI Logo */}
-        <div className="flex justify-center">
-          <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-3xl lumi-gradient flex items-center justify-center shadow-xl">
-            <span className="text-white font-bold text-2xl sm:text-3xl">L</span>
-          </div>
-        </div>
-
-        {/* Welcome Message */}
-        <div className="space-y-4 sm:space-y-6">
-          <h1 className="text-3xl sm:text-5xl font-bold text-lumi-primary tracking-tight">
-            Welcome to LUMI
+    <div className="flex-1 flex flex-col items-center justify-between p-4 sm:p-6">
+      <div className="w-full max-w-4xl mx-auto flex-1 flex flex-col items-center justify-center">
+        {/* Enhanced Branding Header */}
+        <motion.div 
+          className="mb-12 sm:mb-16 flex flex-col items-center w-full"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: 'easeOut' }}
+        >
+          <h1 
+            className="text-7xl sm:text-8xl md:text-9xl font-black tracking-tight bg-gradient-to-r from-blue-500 via-purple-500 to-orange-400 bg-clip-text text-transparent drop-shadow-lg" 
+            style={{
+              backgroundSize: '200% auto',
+              animation: 'gradient 8s ease infinite',
+              lineHeight: '1',
+              marginBottom: '0.5rem',
+              textShadow: '0 2px 4px rgba(0,0,0,0.1)'
+            }}
+          >
+            LYRA
           </h1>
-          <p className="text-xl sm:text-2xl text-lumi-secondary font-medium">
-            AI Assistant Powered by Multiple Models
-          </p>
-          <p className="text-base sm:text-lg text-lumi-secondary max-w-lg mx-auto leading-relaxed">
-            Choose your preferred AI model and start an intelligent conversation
-          </p>
-        </div>
-
-        {/* Features Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mt-12">
-          <div className="flex items-start space-x-3 p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-lumi-surface to-white border border-lumi-border/50 shadow-sm hover:shadow-md transition-shadow">
-            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-blue-500/10 flex items-center justify-center">
-              <MessageCircle className="h-5 w-5 sm:h-6 sm:w-6 text-blue-500" />
-            </div>
-            <div className="text-left">
-              <h3 className="font-semibold text-lumi-primary text-base sm:text-lg">Smart Conversations</h3>
-              <p className="text-sm sm:text-base text-lumi-secondary mt-1">
-                Natural, context-aware discussions
+          <motion.div 
+            className="w-full mt-3 px-4"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1, duration: 0.5 }}
+          >
+            <p className="text-lg sm:text-2xl font-medium text-lumi-secondary/80 dark:text-lumi-secondary/70 tracking-normal font-sans text-center leading-tight">
+              A constellation of models, unified through simplicity
+            </p>
+          </motion.div>
+        </motion.div>
+        
+        {/* Feature Cards */}
+        <motion.div 
+          className="w-full max-w-3xl grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 py-4 sm:py-6 px-2"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2, duration: 0.5 }}
+        >
+          {features.map((card, index) => (
+            <motion.div 
+              key={card.title}
+              className="flex flex-col items-center p-4 sm:p-5 rounded-xl bg-white dark:bg-lumi-surface/80 border border-lumi-border/30 dark:border-lumi-border/20 shadow-sm hover:shadow-md dark:shadow-lumi-border/10 transition-all duration-300 hover:-translate-y-0.5"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 + (index * 0.1), duration: 0.4 }}
+            >
+              <div className={`w-10 h-10 rounded-lg ${card.bg} dark:bg-opacity-30 flex items-center justify-center mb-3`}>
+                {card.icon}
+              </div>
+              <h3 className="font-semibold text-lumi-primary dark:text-white text-sm sm:text-base mb-1">
+                {card.title}
+              </h3>
+              <p className="text-xs sm:text-sm text-lumi-secondary/80 dark:text-lumi-secondary/80 text-center">
+                {card.description}
               </p>
-            </div>
-          </div>
-
-          <div className="flex items-start space-x-3 p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-lumi-surface to-white border border-lumi-border/50 shadow-sm hover:shadow-md transition-shadow">
-            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-purple-500/10 flex items-center justify-center">
-              <Sparkles className="h-5 w-5 sm:h-6 sm:w-6 text-purple-500" />
-            </div>
-            <div className="text-left">
-              <h3 className="font-semibold text-lumi-primary text-base sm:text-lg">Multiple Models</h3>
-              <p className="text-sm sm:text-base text-lumi-secondary mt-1">
-                Access different AI capabilities
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-start space-x-3 p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-lumi-surface to-white border border-lumi-border/50 shadow-sm hover:shadow-md transition-shadow">
-            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-green-500/10 flex items-center justify-center">
-              <Shield className="h-5 w-5 sm:h-6 sm:w-6 text-green-500" />
-            </div>
-            <div className="text-left">
-              <h3 className="font-semibold text-lumi-primary text-base sm:text-lg">Private & Secure</h3>
-              <p className="text-sm sm:text-base text-lumi-secondary mt-1">
-                Your data stays protected
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-start space-x-3 p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-lumi-surface to-white border border-lumi-border/50 shadow-sm hover:shadow-md transition-shadow">
-            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-orange-500/10 flex items-center justify-center">
-              <Zap className="h-5 w-5 sm:h-6 sm:w-6 text-orange-500" />
-            </div>
-            <div className="text-left">
-              <h3 className="font-semibold text-lumi-primary text-base sm:text-lg">Lightning Fast</h3>
-              <p className="text-sm sm:text-base text-lumi-secondary mt-1">
-                Quick responses and interactions
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Getting Started */}
-        <div className="bg-gradient-to-r from-lumi-accent/5 to-blue-500/5 border border-lumi-accent/20 rounded-2xl p-6 sm:p-8 mt-8">
-          <div className="flex items-center justify-center gap-2 mb-4">
-            <div className="w-6 h-6 rounded-full lumi-gradient flex items-center justify-center">
-              <span className="text-white font-bold text-xs">1</span>
-            </div>
-            <span className="text-sm font-medium text-lumi-primary">Quick Start</span>
-          </div>
-          <p className="text-sm sm:text-base text-lumi-secondary">
-            Set your API key, choose a model, and start chatting with AI
-          </p>
-        </div>
+            </motion.div>
+          ))}
+        </motion.div>
       </div>
     </div>
   );

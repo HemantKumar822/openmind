@@ -3,17 +3,21 @@ import { AVAILABLE_MODELS } from '@/lib/models';
 import ReactMarkdown, { Components } from 'react-markdown';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
-import { memo, useMemo } from 'react';
+import { memo, useMemo, useState } from 'react';
 import { CodeBlock } from '@/components/ui/CodeBlock';
 import rehypeRaw from 'rehype-raw';
 import remarkGfm from 'remark-gfm';
 import { ComponentPropsWithoutRef } from 'react';
+import { MessageThread } from './MessageThread';
+import { useChatContext } from '@/providers/ChatProvider';
 
 interface ChatMessageProps {
   message: ChatMessageType;
+  onReply?: (messageId: string) => void;
+  className?: string;
 }
 
-function ChatMessageComponent({ message }: ChatMessageProps) {
+function ChatMessageComponent({ message, onReply, className }: ChatMessageProps) {
   const isUser = message.role === 'user';
   const model = AVAILABLE_MODELS.find(m => m.id === message.modelId);
   const isTyping = message.isStreaming === true;
@@ -193,8 +197,8 @@ function ChatMessageComponent({ message }: ChatMessageProps) {
     };
 
     return (
-      <div className="markdown-content">
-        <div className="prose dark:prose-invert prose-sm max-w-none">
+      <div className={cn('markdown-content', className)}>
+        <div className="prose prose-sm dark:prose-invert max-w-none">
           <ReactMarkdown
             rehypePlugins={[rehypeRaw]}
             remarkPlugins={[remarkGfm]}
@@ -207,54 +211,60 @@ function ChatMessageComponent({ message }: ChatMessageProps) {
     );
   };
 
+  const { activeSession, replyToMessage } = useChatContext();
+  
+  const handleReply = () => {
+    if (activeSession) {
+      replyToMessage(activeSession.id, message.id);
+    }
+  };
+
+  const renderContent = () => {
+    return (
+      <motion.div
+        className={cn(
+          'group flex flex-col space-y-2 relative',
+          isUser ? 'items-end' : 'items-start',
+          className
+        )}
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.2 }}
+      >
+        {renderMarkdown()}
+        
+        {message.children?.length > 0 && (
+          <MessageThread 
+            messageIds={message.children}
+            onReply={onReply}
+            className="mt-2"
+          />
+        )}
+      </motion.div>
+    );
+  };
+
   return (
-    <motion.div 
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.2, type: 'spring', damping: 25, stiffness: 200 }}
-      className={cn(
-        'w-full px-2 sm:px-4 py-1.5 sm:py-2',
-        isUser ? 'flex justify-end' : 'block'
-      )}
-    >
-      {isUser ? (
-        <div className="relative max-w-[90%] sm:max-w-[85%] lg:max-w-[75%] xl:max-w-[65%] rounded-2xl p-4 bg-lumi-accent text-white shadow-lg transition-all duration-200 ease-out">
-          <p className="m-0 text-sm sm:text-[15px] leading-relaxed text-white break-words">
-            {content}
-          </p>
+    <div className={cn(
+      'w-full px-2 sm:px-4 py-2',
+      isUser ? 'flex justify-end' : 'block'
+    )}>
+      <div className={cn(
+        'w-full',
+        isUser ? 'flex justify-end' : 'max-w-4xl mx-auto'
+      )}>
+        <div className={cn(
+          'w-full',
+          isUser ? 'max-w-[90%] sm:max-w-[85%] lg:max-w-[75%] xl:max-w-[65%]' : ''
+        )}>
+          <MessageThread 
+            message={message} 
+            messages={activeSession?.messages || []} 
+            activeSessionId={activeSession?.id || ''}
+            onReply={handleReply}
+          />
         </div>
-      ) : (
-        <div className="w-full max-w-4xl mx-auto px-1 sm:px-4">
-          {/* Message Header */}
-          {model && (
-            <div className="flex items-center gap-2 mb-1.5 px-1 sm:px-0">
-              <div className="w-5 h-5 rounded-full lumi-gradient flex items-center justify-center shadow-sm flex-shrink-0">
-                <span className="text-white font-bold text-xs">L</span>
-              </div>
-              <span className="text-sm font-medium text-lumi-primary">{model.name}</span>
-            </div>
-          )}
-          
-          {/* Message Content */}
-          <div className={cn(
-            'prose prose-sm max-w-none dark:prose-invert',
-            !model && 'pt-1' // Add padding if no header
-          )}>
-            <div className="space-y-3">
-              <div className="min-h-[1.5em] w-full">
-                {renderMarkdown()}
-                {isTyping && (
-                  <div className="flex items-center mt-1 space-x-1">
-                    <div className="w-2 h-2 rounded-full bg-lumi-accent/60 animate-bounce" style={{ animationDelay: '0ms' }} />
-                    <div className="w-2 h-2 rounded-full bg-lumi-accent/60 animate-bounce" style={{ animationDelay: '150ms' }} />
-                    <div className="w-2 h-2 rounded-full bg-lumi-accent/60 animate-bounce" style={{ animationDelay: '300ms' }} />
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      </div>
     </motion.div>
   );
 }
