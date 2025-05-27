@@ -151,7 +151,7 @@ export const Header = ({
                 </Button>
               </DialogTrigger>
               <DialogContent 
-                className="sm:max-w-lg"
+                className="sm:max-w-lg bg-background dark:bg-gray-900"
                 aria-describedby="api-key-description"
               >
                 <DialogHeader>
@@ -185,7 +185,7 @@ export const Header = ({
                     </p>
                   </div>
 
-                  <div className="rounded-lg bg-lumi-surface/50 dark:bg-lumi-surface/30 p-4 space-y-3">
+                  <div className="rounded-lg bg-gray-100 dark:bg-gray-800 p-4 space-y-3">
                     <h4 className="text-sm font-medium flex items-center gap-2">
                       <Info className="h-4 w-4 text-lumi-primary" />
                       How to get your API key
