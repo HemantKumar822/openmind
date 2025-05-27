@@ -131,14 +131,14 @@ export const ModelSelector = ({
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
             className={`
               fixed sm:absolute left-4 right-4 sm:left-auto sm:right-auto sm:w-[280px] z-50 mt-1 py-1 shadow-lg
-              bg-background dark:bg-gray-900 border rounded-lg border-border focus:outline-none
+              bg-white dark:bg-gray-900 border rounded-lg border-border focus:outline-none
               ${isOpen ? 'block' : 'hidden'} overflow-hidden
               max-h-[70vh] overflow-y-auto
             `}
             role="listbox"
             aria-label="Available models"
           >
-            <div className="py-1.5 text-xs font-medium text-muted-foreground/70 px-3 mb-1 sticky top-0 bg-background dark:bg-gray-900 z-10 border-b border-border">
+            <div className="py-1.5 text-xs font-medium text-muted-foreground/70 px-3 mb-1 sticky top-0 bg-white dark:bg-gray-900 z-10 border-b border-border">
               Select a model
             </div>
             {AVAILABLE_MODELS.map((model) => (

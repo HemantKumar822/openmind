@@ -151,7 +151,7 @@ export const Header = ({
                 </Button>
               </DialogTrigger>
               <DialogContent 
-                className="sm:max-w-lg bg-background dark:bg-gray-900"
+                className="sm:max-w-lg"
                 aria-describedby="api-key-description"
               >
                 <DialogHeader>
@@ -207,6 +207,7 @@ export const Header = ({
                       Cancel
                     </Button>
                     <Button 
+                      variant="outline"
                       onClick={handleApiKeySave}
                       disabled={!apiKey.trim()}
                       className="w-full sm:w-auto"

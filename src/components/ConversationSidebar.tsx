@@ -154,16 +154,16 @@ export const ConversationSidebar = ({
           
           {/* New Chat Button */}
           <div className="p-4 border-b border-gray-200 dark:border-gray-700/60">
-            <Button 
+            <button 
               onClick={() => {
                 onNewChat();
                 onClose();
               }}
-              className="w-full bg-lumi-primary hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-500 text-white transition-colors duration-200 shadow-sm"
+              className="w-full flex items-center justify-center h-10 px-4 py-2 bg-blue-600 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-500 text-white font-medium rounded-md transition-colors duration-200 shadow-sm border border-blue-700 dark:border-blue-500 hover:border-blue-800 dark:hover:border-blue-400"
             >
               <Plus className="mr-2 h-4 w-4" />
               New Chat
-            </Button>
+            </button>
           </div>
           
           {/* Conversation List */}
