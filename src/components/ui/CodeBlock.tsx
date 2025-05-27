@@ -62,14 +62,14 @@ export function CodeBlock({
 
   
   return (
-    <div className={cn('rounded-lg overflow-hidden border border-gray-200 dark:border-lumi-border/30', className)} data-theme={isDarkMode ? 'dark' : 'light'}>
-      <div className="bg-gray-100 dark:bg-lumi-surface/90 px-4 py-2 text-xs text-gray-600 dark:text-lumi-secondary border-b border-gray-200 dark:border-lumi-border/20 flex justify-between items-center">
+    <div className={cn('rounded-lg overflow-hidden border border-border dark:border-gray-800', className)} data-theme={isDarkMode ? 'dark' : 'light'}>
+      <div className="bg-gray-50 dark:bg-gray-900 px-4 py-2 text-xs text-muted-foreground border-b border-border dark:border-gray-800 flex justify-between items-center">
         <div className="flex items-center space-x-2">
-          <span className="font-mono text-xs font-medium text-gray-700 dark:text-lumi-secondary">{languageName}</span>
+          <span className="font-mono text-xs font-medium text-foreground">{languageName}</span>
           {lineCount > 1 && (
             <button
               onClick={toggleLineNumbers}
-              className="text-xs text-gray-500 hover:text-gray-700 dark:opacity-50 dark:hover:opacity-100 transition-opacity"
+              className="text-xs text-muted-foreground/80 hover:text-foreground transition-colors"
               title={shouldShowLineNumbers ? 'Hide line numbers' : 'Show line numbers'}
             >
               {shouldShowLineNumbers ? 'Hide #' : 'Show #'}
@@ -78,14 +78,14 @@ export function CodeBlock({
         </div>
         <button
           onClick={handleCopy}
-          className="flex items-center space-x-1.5 text-xs text-gray-700 hover:text-gray-900 dark:text-lumi-secondary dark:hover:text-lumi-accent bg-white/80 hover:bg-white dark:bg-transparent px-2.5 py-1 rounded-md transition-colors border border-gray-200 dark:border-transparent"
+          className="flex items-center space-x-1.5 text-xs text-foreground hover:text-primary bg-white/90 hover:bg-white dark:bg-gray-800/90 dark:hover:bg-gray-800 px-2.5 py-1 rounded-md transition-colors border border-border dark:border-gray-700"
           disabled={isCopied}
           aria-label={isCopied ? 'Copied!' : 'Copy code'}
         >
           {isCopied ? (
             <>
-              <Check className="w-3.5 h-3.5 text-green-600 dark:text-lumi-accent" />
-              <span className="text-green-600 dark:text-lumi-accent">Copied!</span>
+              <Check className="w-3.5 h-3.5 text-green-600 dark:text-green-400" />
+              <span className="text-green-600 dark:text-green-400">Copied!</span>
             </>
           ) : (
             <>
@@ -107,8 +107,8 @@ export function CodeBlock({
               customStyle={{
                 margin: 0,
                 padding: '1rem',
-                background: 'white',
-                color: '#374151',
+                background: 'hsl(var(--background))',
+                color: 'hsl(var(--foreground))',
                 fontSize: '0.875rem',
                 lineHeight: '1.5',
                 borderRadius: '0 0 0.5rem 0.5rem',
@@ -133,8 +133,8 @@ export function CodeBlock({
                 position: 'sticky',
                 left: 0,
                 fontFamily: 'var(--font-mono)',
-                backgroundColor: 'white',
-                borderRight: '1px solid #E5E7EB',
+                backgroundColor: 'hsl(var(--background))',
+                borderRight: '1px solid hsl(var(--border))',
                 fontSize: '0.875em',
                 lineHeight: '1.5'
               }}
@@ -153,8 +153,8 @@ export function CodeBlock({
               customStyle={{
                 margin: 0,
                 padding: '1rem',
-                background: 'hsl(222.2, 84%, 4.9%)',
-                color: 'hsl(0, 0%, 90%)',
+                background: 'hsl(var(--muted))',
+                color: 'hsl(var(--muted-foreground))',
                 fontSize: '0.875rem',
                 lineHeight: '1.5',
                 borderRadius: '0 0 0.5rem 0.5rem',
@@ -179,8 +179,8 @@ export function CodeBlock({
                 position: 'sticky',
                 left: 0,
                 fontFamily: 'var(--font-mono)',
-                backgroundColor: 'hsl(222.2, 84%, 4.9%)',
-                borderRight: '1px solid hsl(0, 0%, 20%)',
+                backgroundColor: 'hsl(var(--muted))',
+                borderRight: '1px solid hsl(var(--border))',
                 fontSize: '0.875em',
                 lineHeight: '1.5'
               }}

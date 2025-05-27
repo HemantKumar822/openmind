@@ -89,31 +89,31 @@ export const ModelSelector = ({
   }
 
   return (
-    <div className={`relative ${className}`}>
+    <div className={`relative w-full sm:w-[220px] ${className}`}>
       <button
         ref={triggerRef}
         onClick={() => setIsOpen(!isOpen)}
         className={`
           group flex items-center justify-between w-full h-10 px-3 py-2
-          rounded-lg border border-lumi-border/70 dark:border-lumi-border/30
-          bg-white/90 dark:bg-lumi-surface/10 backdrop-blur-sm
-          hover:border-lumi-primary/50 dark:hover:border-lumi-primary/50
-          focus:outline-none focus:ring-2 focus:ring-lumi-primary/50 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-lumi-surface
+          rounded-lg border border-border/70 dark:border-border/70
+          bg-transparent hover:bg-accent/10
+          hover:border-primary/50 dark:hover:border-primary/50
+          focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background
           transition-all duration-200 ease-out
-          ${isOpen ? 'ring-2 ring-lumi-primary/50 ring-offset-2 ring-offset-white dark:ring-offset-lumi-surface' : ''}
+          ${isOpen ? 'ring-2 ring-ring/50 ring-offset-2 ring-offset-background' : ''}
         `}
         aria-haspopup="listbox"
         aria-expanded={isOpen}
         aria-label="Select model"
       >
         <div className="flex items-center min-w-0">
-          <span className="text-sm font-medium text-lumi-primary truncate text-left">
+          <span className="text-sm font-medium text-primary truncate text-left">
             {selectedModelData.name}
           </span>
         </div>
         <ChevronDown 
           className={`
-            h-4 w-4 text-lumi-primary/70 ml-2 flex-shrink-0
+            h-4 w-4 text-primary/70 ml-2 flex-shrink-0
             transition-transform duration-200
             ${isOpen ? 'transform rotate-180' : ''}
           `} 
@@ -130,16 +130,15 @@ export const ModelSelector = ({
             exit={{ opacity: 0, y: 8, scale: 0.98, transition: { duration: 0.15 } }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
             className={`
-              absolute z-50 mt-1 w-full py-1 shadow-lg
-              bg-white/95 dark:bg-lumi-surface/95 backdrop-blur-sm border rounded-lg
-              border-lumi-border/50 dark:border-lumi-border/30
-              focus:outline-none
-              ${isOpen ? 'block' : 'hidden'}
+              fixed sm:absolute left-4 right-4 sm:left-auto sm:right-auto sm:w-[280px] z-50 mt-1 py-1 shadow-lg
+              bg-background dark:bg-gray-900 border rounded-lg border-border focus:outline-none
+              ${isOpen ? 'block' : 'hidden'} overflow-hidden
+              max-h-[70vh] overflow-y-auto
             `}
             role="listbox"
             aria-label="Available models"
           >
-            <div className="px-2 py-1.5 text-xs font-medium text-lumi-secondary/60 dark:text-lumi-secondary/70 px-3 mb-1 sticky top-0 bg-white/80 dark:bg-lumi-surface/80 backdrop-blur-sm z-10 border-b border-lumi-border/30 dark:border-lumi-border/10">
+            <div className="py-1.5 text-xs font-medium text-muted-foreground/70 px-3 mb-1 sticky top-0 bg-background dark:bg-gray-900 z-10 border-b border-border">
               Select a model
             </div>
             {AVAILABLE_MODELS.map((model) => (
@@ -160,12 +159,12 @@ export const ModelSelector = ({
                   }
                 }}
                 className={`
-                  relative flex items-center justify-between px-3 py-2.5 mx-1 rounded-md cursor-pointer
-                  transition-colors duration-150
-                  focus:outline-none focus:bg-lumi-surface/50 dark:focus:bg-lumi-surface/20
+                  relative flex items-center justify-between px-4 py-3 sm:px-3 sm:py-2.5 mx-1 rounded-md cursor-pointer
+                  transition-colors duration-150 active:bg-accent/40
+                  focus:outline-none focus:bg-accent/50 touch-target
                   ${model.id === selectedModel 
-                    ? 'bg-lumi-surface/50 dark:bg-lumi-surface/20 text-lumi-primary' 
-                    : 'text-lumi-secondary hover:bg-lumi-surface/30 dark:hover:bg-lumi-surface/20'}
+                    ? 'bg-accent/50 text-foreground' 
+                    : 'text-muted-foreground hover:bg-accent/30'}
                 `}
                 aria-selected={model.id === selectedModel}
               >

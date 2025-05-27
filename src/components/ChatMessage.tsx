@@ -7,7 +7,6 @@ import { memo, useMemo } from 'react';
 import { CodeBlock } from '@/components/ui/CodeBlock';
 import rehypeRaw from 'rehype-raw';
 import remarkGfm from 'remark-gfm';
-import { ComponentPropsWithoutRef } from 'react';
 
 interface ChatMessageProps {
   message: ChatMessageType;
@@ -41,7 +40,7 @@ function ChatMessageComponent({ message }: ChatMessageProps) {
         if (isInline) {
           return (
             <code 
-              className="bg-lumi-accent/10 text-lumi-accent px-1.5 py-0.5 rounded text-sm font-mono break-words"
+              className="bg-primary-100 dark:bg-primary-900/50 text-primary-700 dark:text-primary-300 px-1.5 py-0.5 rounded text-sm font-mono break-words"
               {...props}
             >
               {children}
@@ -101,7 +100,7 @@ function ChatMessageComponent({ message }: ChatMessageProps) {
             href={href}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-lumi-accent hover:underline break-words"
+            className="text-primary-600 dark:text-primary-400 hover:underline break-words"
             {...props}
           >
             {props.children}
@@ -110,7 +109,7 @@ function ChatMessageComponent({ message }: ChatMessageProps) {
       },
       blockquote: ({ node, children, ...props }: { node?: any; children?: React.ReactNode; [key: string]: any }) => (
         <blockquote
-          className="border-l-4 border-lumi-accent/30 pl-4 py-1 my-3 text-lumi-secondary"
+          className="border-l-4 border-primary-300 dark:border-primary-600 pl-4 py-1 my-3 text-gray-600 dark:text-gray-300"
           {...props}
         >
           {children}
@@ -139,29 +138,29 @@ function ChatMessageComponent({ message }: ChatMessageProps) {
       hr: () => <hr className="my-4 border-lumi-border/30" />,
       table: ({ node, children, ...props }: { node?: any; children?: React.ReactNode; [key: string]: any }) => (
         <div className="overflow-x-auto my-4" {...props}>
-          <table className="min-w-full border-collapse border border-lumi-border/30">
+          <table className="min-w-full border-collapse border border-gray-200 dark:border-gray-700">
             {children}
           </table>
         </div>
       ),
       thead: ({ node, children, ...props }: { node?: any; children?: React.ReactNode; [key: string]: any }) => (
-        <thead className="bg-lumi-surface/50 dark:bg-lumi-surface/80" {...props}>
+        <thead className="bg-gray-100 dark:bg-gray-800/80" {...props}>
           {children}
         </thead>
       ),
       tbody: ({ node, children, ...props }: { node?: any; children?: React.ReactNode; [key: string]: any }) => (
-        <tbody className="divide-y divide-lumi-border/30" {...props}>
+        <tbody className="divide-y divide-gray-200 dark:divide-gray-700" {...props}>
           {children}
         </tbody>
       ),
       tr: ({ node, children, isHeader, ...props }: { node?: any; children?: React.ReactNode; isHeader?: boolean; [key: string]: any }) => (
-        <tr className={`hover:bg-lumi-surface/30 transition-colors ${isHeader ? 'font-semibold' : ''}`} {...props}>
+        <tr className={`hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors ${isHeader ? 'font-semibold' : ''}`} {...props}>
           {children}
         </tr>
       ),
       th: ({ node, children, ...props }: { node?: any; children?: React.ReactNode; [key: string]: any }) => (
         <th 
-          className="px-4 py-2 text-left text-sm font-medium text-lumi-primary border-b border-lumi-border/30"
+          className="px-4 py-2 text-left text-sm font-medium text-gray-900 dark:text-gray-100 border-b border-gray-200 dark:border-gray-700"
           {...props}
         >
           {children}
@@ -169,7 +168,7 @@ function ChatMessageComponent({ message }: ChatMessageProps) {
       ),
       td: ({ node, children, ...props }: { node?: any; children?: React.ReactNode; [key: string]: any }) => (
         <td 
-          className="px-4 py-2 text-sm border-b border-lumi-border/20"
+          className="px-4 py-2 text-sm border-b border-gray-200 dark:border-gray-700"
           {...props}
         >
           {children}
@@ -186,7 +185,7 @@ function ChatMessageComponent({ message }: ChatMessageProps) {
         </em>
       ),
       del: ({ node, children, ...props }: { node?: any; children?: React.ReactNode; [key: string]: any }) => (
-        <del className="line-through text-lumi-secondary" {...props}>
+        <del className="line-through text-gray-500 dark:text-gray-400" {...props}>
           {children}
         </del>
       ),
@@ -218,20 +217,20 @@ function ChatMessageComponent({ message }: ChatMessageProps) {
       )}
     >
       {isUser ? (
-        <div className="relative max-w-[90%] sm:max-w-[85%] lg:max-w-[75%] xl:max-w-[65%] rounded-2xl p-4 bg-lumi-accent text-white shadow-lg transition-all duration-200 ease-out">
+        <div className="relative max-w-[90%] sm:max-w-[85%] lg:max-w-[75%] xl:max-w-[65%] rounded-2xl p-4 bg-primary-600 text-white shadow-lg transition-all duration-200 ease-out">
           <p className="m-0 text-sm sm:text-[15px] leading-relaxed text-white break-words">
             {content}
           </p>
         </div>
       ) : (
-        <div className="w-full max-w-4xl mx-auto px-1 sm:px-4">
+        <div className="w-full max-w-4xl mx-auto pl-0.5 pr-1 sm:px-4">
           {/* Message Header */}
           {model && (
-            <div className="flex items-center gap-2 mb-1.5 px-1 sm:px-0">
-              <div className="w-5 h-5 rounded-full lumi-gradient flex items-center justify-center shadow-sm flex-shrink-0">
+            <div className="flex items-center gap-2 mb-1.5">
+              <div className="w-5 h-5 rounded-full bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center shadow-sm flex-shrink-0">
                 <span className="text-white font-bold text-xs">L</span>
               </div>
-              <span className="text-sm font-medium text-lumi-primary">{model.name}</span>
+              <span className="text-sm font-medium text-gray-900 dark:text-gray-100">{model.name}</span>
             </div>
           )}
           
@@ -244,10 +243,10 @@ function ChatMessageComponent({ message }: ChatMessageProps) {
               <div className="min-h-[1.5em] w-full">
                 {renderMarkdown()}
                 {isTyping && (
-                  <div className="flex items-center mt-1 space-x-1">
-                    <div className="w-2 h-2 rounded-full bg-lumi-accent/60 animate-bounce" style={{ animationDelay: '0ms' }} />
-                    <div className="w-2 h-2 rounded-full bg-lumi-accent/60 animate-bounce" style={{ animationDelay: '150ms' }} />
-                    <div className="w-2 h-2 rounded-full bg-lumi-accent/60 animate-bounce" style={{ animationDelay: '300ms' }} />
+                  <div className="typing-indicator">
+                    <span></span>
+                    <span></span>
+                    <span></span>
                   </div>
                 )}
               </div>

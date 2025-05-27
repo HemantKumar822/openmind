@@ -181,11 +181,8 @@ const Index = () => {
   }, [currentChat?.messages]);
 
   const handleThemeToggle = useCallback(() => {
-    // Cycle through themes: light -> dark -> system -> light
-    const newTheme = 
-      theme === 'light' ? 'dark' :
-      theme === 'dark' ? 'system' : 'light';
-    
+    // Toggle between light and dark themes only
+    const newTheme = theme === 'light' ? 'dark' : 'light';
     setTheme(newTheme);
   }, [theme, setTheme]);
 

@@ -223,11 +223,7 @@ export const Header = ({
               size="icon"
               onClick={onThemeToggle}
               className="rounded-full hover:bg-lumi-surface/50 dark:hover:bg-lumi-surface/30 transition-colors relative group h-8 w-8 sm:h-9 sm:w-9 flex items-center justify-center"
-              title={
-                theme === 'dark' ? 'Switch to system theme' :
-                theme === 'light' ? 'Switch to dark mode' :
-                'Switch to light mode'
-              }
+              title={theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
             >
               <div className="relative w-5 h-5 flex items-center justify-center">
                 <Sun 
@@ -240,26 +236,9 @@ export const Header = ({
                     theme === 'dark' ? 'opacity-100 rotate-0' : 'opacity-0 rotate-45 absolute'
                   }`} 
                 />
-                <svg 
-                  className={`h-4 w-4 sm:h-5 sm:w-5 text-blue-500 transition-all duration-300 ${
-                    theme === 'system' ? 'opacity-100' : 'opacity-0 scale-75 absolute'
-                  }`}
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
-                  <line x1="8" y1="21" x2="16" y2="21" />
-                  <line x1="12" y1="17" x2="12" y2="21" />
-                </svg>
               </div>
               <span className="sr-only">
-                {theme === 'dark' ? 'Switch to system theme' :
-                 theme === 'light' ? 'Switch to dark mode' :
-                 'Switch to light mode'}
+                {theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
               </span>
             </Button>
           </div>

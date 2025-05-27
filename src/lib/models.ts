@@ -23,8 +23,8 @@ export const AVAILABLE_MODELS: Model[] = [
     provider: "Google"
   },
   {
-    id: "qwen/qwen3-235b-a22b-chat:free",
-    name: "Qwen3-235B A22 Chat",
+    id: "qwen/qwen3-235b-a22b:free",
+    name: "Qwen3-235B A22B",
     description: "Ultra-large model with cutting-edge reasoning and instruction-following capabilities",
     guidance: "Best for complex reasoning, long-form, and assistant-like usage",
     provider: "Qwen"
@@ -38,7 +38,7 @@ export const AVAILABLE_MODELS: Model[] = [
   },
   {
     id: "deepseek/deepseek-chat-v3-0324:free",
-    name: "DeepSeek Chat V3",
+    name: "DeepSeek V3",
     description: "685B MoE model with state-of-the-art chat performance",
     guidance: "Best for general conversation, coding, and logical tasks",
     provider: "DeepSeek"
