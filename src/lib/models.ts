@@ -16,8 +16,8 @@ export const AVAILABLE_MODELS: Model[] = [
     provider: "DeepSeek"
   },
   {
-    id: "google/gemini-2.0-flash-exp:free",
-    name: "Gemini 2.0 Flash",
+    id: "google/gemma-3n-e4b-it:free",
+    name: "Gemma 3n 4B",
     description: "Fast and efficient multimodal model with great instruction-following ability",
     guidance: "Great for fast responses and multimodal or API tool-based tasks",
     provider: "Google"

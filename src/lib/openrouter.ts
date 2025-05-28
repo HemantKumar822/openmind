@@ -36,12 +36,34 @@ export class OpenRouterClient {
     signal?: AbortSignal
   ): AsyncGenerator<StreamChunk> {
     try {
-      // Add system prompt as the first message
       const systemPrompt = getSystemPrompt(modelName);
-      const messagesWithSystem: OpenRouterMessage[] = [
-        { role: 'system', content: systemPrompt },
-        ...messages.filter(msg => msg.role !== 'system')
-      ];
+      let messagesToSend = [...messages];
+
+      // Check if the model is Google's Gemma which doesn't support system prompts
+      const isGemmaModel = modelId.includes('gemma');
+      
+      if (isGemmaModel) {
+        // For Gemma, prepend the system prompt as a user message
+        if (messagesToSend.length > 0 && messagesToSend[0].role === 'user') {
+          // If first message is from user, prepend system prompt to its content
+          messagesToSend[0] = {
+            ...messagesToSend[0],
+            content: `${systemPrompt}\n\n${messagesToSend[0].content}`
+          };
+        } else {
+          // Otherwise add system prompt as a separate user message
+          messagesToSend.unshift({
+            role: 'user',
+            content: systemPrompt
+          });
+        }
+      } else {
+        // For other models, use standard system prompt approach
+        messagesToSend = [
+          { role: 'system', content: systemPrompt },
+          ...messages.filter(msg => msg.role !== 'system')
+        ];
+      }
 
       const response = await fetch(this.baseUrl, {
         method: 'POST',
@@ -53,7 +75,7 @@ export class OpenRouterClient {
         },
         body: JSON.stringify({
           model: modelId,
-          messages: messagesWithSystem,
+          messages: messagesToSend,
           temperature: 0.7,
           max_tokens: 2048,
           stream: true
