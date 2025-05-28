@@ -25,10 +25,14 @@ function ChatMessageComponent({ message }: ChatMessageProps) {
       .replace(/```(\w*)\n([\s\S]*?)\n```/g, (match, lang, code) => {
         return `\n\`\`\`${lang}\n${code.trim()}\n\`\`\`\n`;
       })
-      // Ensure lists have proper spacing
-      .replace(/(\n\s*[-*+]\s+[^\n]+)/g, '\n$1\n')
-      // Fix numbered lists
-      .replace(/(\n\s*\d+\.\s+[^\n]+)/g, '\n$1\n');
+      // Clean up list formatting - remove extra newlines that cause spacing issues
+      .replace(/(\n\s*[-*+]\s+)([^\n]+)/g, (match, bullet, text) => {
+        return `\n${bullet}${text.trim()}`;
+      })
+      // Fix numbered lists - ensure they're on their own line but without extra spacing
+      .replace(/(\n\s*\d+\.\s+)([^\n]+)/g, (match, number, text) => {
+        return `\n${number}${text.trim()}`;
+      });
   }, [content]);
 
   const renderMarkdown = () => {
@@ -40,7 +44,7 @@ function ChatMessageComponent({ message }: ChatMessageProps) {
         if (isInline) {
           return (
             <code 
-              className="bg-primary-100 dark:bg-primary-900/50 text-primary-700 dark:text-primary-300 px-1.5 py-0.5 rounded text-sm font-mono break-words"
+              className="bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 px-1.5 py-0.5 rounded text-sm font-mono break-words"
               {...props}
             >
               {children}
@@ -71,25 +75,27 @@ function ChatMessageComponent({ message }: ChatMessageProps) {
         if (!children || (Array.isArray(children) && children.every(child => !child || child === '\n'))) {
           return null;
         }
+        // Check if the paragraph is part of a list item
+        const isInList = node?.parentElement?.tagName?.toLowerCase() === 'li';
         return (
-          <p className="text-foreground leading-relaxed text-sm sm:text-[15px] my-3 first:mt-0 last:mb-0" {...props}>
+          <p className={`text-foreground leading-relaxed text-sm sm:text-[15px] ${isInList ? 'my-1' : 'my-3 first:mt-0 last:mb-0'}`} {...props}>
             {children}
           </p>
         );
       },
       ul: ({ node, children, ...props }: { node?: any; children?: React.ReactNode; [key: string]: any }) => (
-        <ul className="list-disc list-inside space-y-1 my-3 pl-5" {...props}>
+        <ul className="list-disc list-outside space-y-1 my-3 pl-5" {...props}>
           {children}
         </ul>
       ),
       ol: ({ node, children, ...props }: { node?: any; children?: React.ReactNode; [key: string]: any }) => (
-        <ol className="list-decimal list-inside space-y-1 my-3 pl-5" {...props}>
+        <ol className="list-decimal list-outside space-y-1 my-3 pl-5" {...props}>
           {children}
         </ol>
       ),
       li: ({ node, children, ...props }: { node?: any; children?: React.ReactNode; [key: string]: any }) => (
-        <li className="pl-1 -ml-1" {...props}>
-          <span className="-ml-1.5">{children}</span>
+        <li className="mb-1 pl-1" {...props}>
+          <div className="-ml-1.5">{children}</div>
         </li>
       ),
       a: ({ node, ...props }: { node?: any; children?: React.ReactNode; [key: string]: any }) => {
@@ -109,7 +115,7 @@ function ChatMessageComponent({ message }: ChatMessageProps) {
       },
       blockquote: ({ node, children, ...props }: { node?: any; children?: React.ReactNode; [key: string]: any }) => (
         <blockquote
-          className="border-l-4 border-primary-300 dark:border-primary-600 pl-4 py-1 my-3 text-gray-600 dark:text-gray-300"
+          className="border-l-4 border-gray-300 dark:border-black pl-4 py-1 my-3 text-gray-700 dark:text-white"
           {...props}
         >
           {children}
@@ -137,40 +143,34 @@ function ChatMessageComponent({ message }: ChatMessageProps) {
       ),
       hr: () => <hr className="my-4 border-lumi-border/30" />,
       table: ({ node, children, ...props }: { node?: any; children?: React.ReactNode; [key: string]: any }) => (
-        <div className="overflow-x-auto my-4" {...props}>
-          <table className="min-w-full border-collapse border border-gray-200 dark:border-gray-700">
+        <div className="my-4 overflow-x-auto">
+          <table className="min-w-full border-collapse border border-gray-200 dark:border-black" {...props}>
             {children}
           </table>
         </div>
       ),
       thead: ({ node, children, ...props }: { node?: any; children?: React.ReactNode; [key: string]: any }) => (
-        <thead className="bg-gray-100 dark:bg-gray-800/80" {...props}>
+        <thead className="bg-gray-100 dark:bg-black/80" {...props}>
           {children}
         </thead>
       ),
       tbody: ({ node, children, ...props }: { node?: any; children?: React.ReactNode; [key: string]: any }) => (
-        <tbody className="divide-y divide-gray-200 dark:divide-gray-700" {...props}>
+        <tbody className="divide-y divide-gray-200 dark:divide-black" {...props}>
           {children}
         </tbody>
       ),
       tr: ({ node, children, isHeader, ...props }: { node?: any; children?: React.ReactNode; isHeader?: boolean; [key: string]: any }) => (
-        <tr className={`hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors ${isHeader ? 'font-semibold' : ''}`} {...props}>
+        <tr className={`hover:bg-gray-50 dark:hover:bg-black/50 transition-colors ${isHeader ? 'font-semibold' : ''}`} {...props}>
           {children}
         </tr>
       ),
       th: ({ node, children, ...props }: { node?: any; children?: React.ReactNode; [key: string]: any }) => (
-        <th 
-          className="px-4 py-2 text-left text-sm font-medium text-gray-900 dark:text-gray-100 border-b border-gray-200 dark:border-gray-700"
-          {...props}
-        >
+        <th className="border border-gray-200 dark:border-black px-4 py-2 text-left bg-gray-50 dark:bg-black font-medium" {...props}>
           {children}
         </th>
       ),
       td: ({ node, children, ...props }: { node?: any; children?: React.ReactNode; [key: string]: any }) => (
-        <td 
-          className="px-4 py-2 text-sm border-b border-gray-200 dark:border-gray-700"
-          {...props}
-        >
+        <td className="border border-gray-200 dark:border-black px-4 py-2" {...props}>
           {children}
         </td>
       ),
@@ -185,7 +185,7 @@ function ChatMessageComponent({ message }: ChatMessageProps) {
         </em>
       ),
       del: ({ node, children, ...props }: { node?: any; children?: React.ReactNode; [key: string]: any }) => (
-        <del className="line-through text-gray-500 dark:text-gray-400" {...props}>
+        <del className="line-through text-gray-500 dark:text-white" {...props}>
           {children}
         </del>
       ),
@@ -193,7 +193,7 @@ function ChatMessageComponent({ message }: ChatMessageProps) {
 
     return (
       <div className="markdown-content">
-        <div className="prose dark:prose-invert prose-sm max-w-none">
+        <div className="prose prose-sm max-w-none dark:prose-invert prose-dark">
           <ReactMarkdown
             rehypePlugins={[rehypeRaw]}
             remarkPlugins={[remarkGfm]}
@@ -213,22 +213,26 @@ function ChatMessageComponent({ message }: ChatMessageProps) {
       transition={{ duration: 0.2, type: 'spring', damping: 25, stiffness: 200 }}
       className={cn(
         'w-full px-2 sm:px-4 py-1.5 sm:py-2',
-        isUser ? 'flex justify-end' : 'block'
+        isUser ? 'flex justify-center' : 'block'
       )}
     >
       {isUser ? (
-        <div className="relative max-w-[90%] sm:max-w-[85%] lg:max-w-[75%] xl:max-w-[65%] rounded-2xl p-4 bg-primary-600 text-white shadow-lg transition-all duration-200 ease-out">
-          <p className="m-0 text-sm sm:text-[15px] leading-relaxed text-white break-words">
-            {content}
-          </p>
+        <div className="w-full max-w-4xl">
+          <div className="flex justify-end">
+            <div className="relative max-w-[90%] sm:max-w-[85%] lg:max-w-[80%] xl:max-w-[75%] rounded-2xl p-4 bg-blue-600 text-white shadow-lg transition-all duration-200 ease-out hover:shadow-md">
+              <p className="m-0 text-sm sm:text-[15px] leading-relaxed text-white break-words">
+                {content}
+              </p>
+            </div>
+          </div>
         </div>
       ) : (
-        <div className="w-full max-w-4xl mx-auto pl-0.5 pr-1 sm:px-4">
+        <div className="w-full max-w-4xl mx-auto px-1 sm:px-2">
           {/* Message Header */}
           {model && (
             <div className="flex items-center gap-2 mb-1.5">
-              <div className="w-5 h-5 rounded-full bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center shadow-sm flex-shrink-0">
-                <span className="text-white font-bold text-xs">L</span>
+              <div className="w-5 h-5 rounded-full bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center shadow-sm flex-shrink-0">
+                <span className="text-white font-bold text-[10px] leading-none">AI</span>
               </div>
               <span className="text-sm font-medium text-gray-900 dark:text-gray-100">{model.name}</span>
             </div>
@@ -237,10 +241,11 @@ function ChatMessageComponent({ message }: ChatMessageProps) {
           {/* Message Content */}
           <div className={cn(
             'prose prose-sm max-w-none dark:prose-invert',
-            !model && 'pt-1' // Add padding if no header
+            !model && 'pt-1', // Add padding if no header
+            'w-full' // Ensure full width for content
           )}>
             <div className="space-y-3">
-              <div className="min-h-[1.5em] w-full">
+              <div className="min-h-[1.5em] w-full break-words">
                 {renderMarkdown()}
                 {isTyping && (
                   <div className="typing-indicator">

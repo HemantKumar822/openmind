@@ -35,7 +35,7 @@ export const WelcomeScreen = () => {
       <div className="w-full max-w-4xl mx-auto flex-1 flex flex-col items-center justify-center">
         {/* Enhanced Branding Header */}
         <motion.div 
-          className="mb-12 sm:mb-16 flex flex-col items-center w-full"
+          className="mb-0 sm:mb-0 flex flex-col items-center w-full"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: 'easeOut' }}

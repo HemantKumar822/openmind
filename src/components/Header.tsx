@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
-import { Key, MessageSquarePlus, Moon, Sun, Menu, X, Info, MessageSquare } from 'lucide-react';
+import { Key, MessageSquarePlus, Menu, X, Info, MessageSquare, Eye, EyeOff } from 'lucide-react';
 import { ThemePreference } from '@/lib/storage';
 import { v4 as uuidv4 } from 'uuid';
 import { ConversationSidebar, addConversation, Conversation } from './ConversationSidebar';
+import { ThemeToggle } from './ThemeToggle';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -32,6 +33,7 @@ export const Header = ({
   onConversationChange,
 }: HeaderProps) => {
   const [apiKey, setApiKey] = useState(storageUtils.getApiKey() || '');
+  const [showApiKey, setShowApiKey] = useState(false);
   const [isApiKeyDialogOpen, setIsApiKeyDialogOpen] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [conversationTitle, setConversationTitle] = useState('New Chat');
@@ -99,26 +101,35 @@ export const Header = ({
 
   return (
     <>
-      <header className="border-b border-lumi-border/50 bg-background/95 dark:bg-background/90 backdrop-blur sticky top-0 z-40 transition-colors duration-200">
+      <header className="border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-black sticky top-0 z-40 transition-colors duration-200 shadow-sm">
         <div className="w-full px-3 sm:px-4 py-2 sm:py-3">
           <div className="flex items-center justify-between max-w-7xl mx-auto w-full gap-2">
-            {/* Hamburger Menu */}
-            <button 
-              type="button" 
-              onClick={toggleSidebar}
-              className="flex-shrink-0 flex items-center justify-center h-9 w-9 rounded-md hover:bg-lumi-surface/50 dark:hover:bg-lumi-surface/30 focus:outline-none focus:ring-2 focus:ring-lumi-primary/50 transition-colors duration-200" 
-              title="Menu"
-              aria-label="Toggle menu"
-            >
-              <Menu className="h-6 w-6 text-lumi-primary" />
-            </button>
+            <div className="flex items-center flex-1 sm:flex-none sm:w-auto">
+              {/* Hamburger Menu */}
+              <button 
+                type="button" 
+                onClick={toggleSidebar}
+                className="flex-shrink-0 flex items-center justify-center h-9 w-9 rounded-md hover:bg-gray-100 dark:hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-lumi-primary/50 transition-colors duration-200" 
+                title="Menu"
+                aria-label="Toggle menu"
+              >
+                <Menu className="h-6 w-6 text-lumi-primary" />
+              </button>
+            </div>
             
-            {/* Empty flex-1 to push model selector to center */}
-            <div className="flex-1"></div>
+            {/* Model Selector - Centered on desktop */}
+            <div className="hidden sm:flex sm:flex-1 sm:justify-center sm:mx-2">
+              <div className="w-full max-w-[200px]">
+                <ModelSelector 
+                  selectedModel={selectedModel} 
+                  onModelChange={onModelChange}
+                />
+              </div>
+            </div>
             
-            {/* Model Selector - Centered */}
-            <div className="flex justify-center min-w-0">
-              <div className="w-full max-w-[160px] sm:max-w-[180px] md:max-w-[220px]">
+            {/* Mobile Model Selector - Only visible on mobile */}
+            <div className="sm:hidden">
+              <div className="w-[140px]">
                 <ModelSelector 
                   selectedModel={selectedModel} 
                   onModelChange={onModelChange}
@@ -133,7 +144,7 @@ export const Header = ({
               variant="ghost"
               size="icon"
               onClick={handleNewChat}
-              className="hover:bg-lumi-surface/50 dark:hover:bg-lumi-surface/30 h-8 w-8 sm:h-9 sm:w-9 text-lumi-primary hover:text-lumi-primary/90 transition-colors"
+              className="hover:bg-gray-100 dark:hover:bg-[#111] h-8 w-8 sm:h-9 sm:w-9 text-lumi-primary hover:text-lumi-primary/90 transition-colors"
               title="New Chat"
             >
               <MessageSquarePlus className="h-4 w-4 sm:h-5 sm:w-5" />
@@ -144,104 +155,147 @@ export const Header = ({
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="hover:bg-lumi-surface/50 dark:hover:bg-lumi-surface/30 h-8 w-8 sm:h-9 sm:w-9 text-lumi-primary hover:text-lumi-primary/90 transition-colors"
+                  className="hover:bg-gray-100 dark:hover:bg-gray-900 h-8 w-8 sm:h-9 sm:w-9 text-lumi-primary hover:text-lumi-primary/90 transition-colors"
                   title="API Key"
                 >
                   <Key className="h-4 w-4 sm:h-5 sm:w-5" />
                 </Button>
               </DialogTrigger>
               <DialogContent 
-                className="sm:max-w-lg"
+                className="sm:max-w-md bg-white dark:bg-gray-950 border border-gray-200 dark:border-gray-800 rounded-lg p-0 overflow-hidden"
                 aria-describedby="api-key-description"
               >
-                <DialogHeader>
-                  <DialogTitle className="flex items-center gap-2 text-lumi-primary">
-                    <Key className="h-5 w-5" />
-                    <span>OpenRouter API Key</span>
-                  </DialogTitle>
-                </DialogHeader>
-                <div className="space-y-6">
-                  <div className="space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="apiKey" className="text-sm font-medium text-lumi-primary/90 dark:text-lumi-primary/80">
-                        Your API Key
-                      </Label>
-                      <Input
-                        id="apiKey"
-                        type="password"
-                        placeholder="sk-or-v1-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-                        value={apiKey}
-                        onChange={(e) => setApiKey(e.target.value)}
-                        className="font-mono text-sm h-10 border-lumi-border/50 dark:border-lumi-border/30 focus-visible:ring-2 focus-visible:ring-lumi-primary/50"
-                        autoComplete="off"
-                        spellCheck={false}
-                      />
+                <div className="p-4 sm:p-5">
+                  <div className="flex items-start gap-3 mb-4">
+                    <div className="p-1.5 rounded-lg bg-lumi-primary/10 mt-0.5">
+                      <Key className="h-4 w-4 text-lumi-primary" />
                     </div>
-                    <p id="api-key-description" className="sr-only">
-                      Enter your OpenRouter API key. This key is stored locally in your browser and only sent to OpenRouter's servers.
-                    </p>
-                    <p className="text-xs text-lumi-secondary/70 dark:text-lumi-secondary/60 px-1">
-                      Your API key is stored locally and only sent to OpenRouter's servers.
-                    </p>
+                    <div>
+                      <h3 className="font-semibold text-gray-900 dark:text-white text-base">OpenRouter API Key</h3>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 -mt-0.5">Securely connect your account</p>
+                    </div>
                   </div>
 
-                  <div className="rounded-lg bg-gray-100 dark:bg-gray-800 p-4 space-y-3">
-                    <h4 className="text-sm font-medium flex items-center gap-2">
-                      <Info className="h-4 w-4 text-lumi-primary" />
-                      How to get your API key
-                    </h4>
-                    <ol className="text-xs space-y-2 list-decimal list-inside text-lumi-secondary/80 dark:text-lumi-secondary/60">
-                      <li>Go to <a href="https://openrouter.ai/" target="_blank" rel="noopener noreferrer" className="text-lumi-primary hover:underline">OpenRouter.ai</a> and sign in</li>
-                      <li>Click on your profile picture → Settings</li>
-                      <li>Find your API key under "API Keys"</li>
-                      <li>Copy and paste it above</li>
-                    </ol>
-                  </div>
+                  <div className="space-y-3">
+                    <div>
+                      <div className="flex items-center justify-between mb-1">
+                        <Label htmlFor="apiKey" className="text-xs font-medium text-gray-700 dark:text-gray-300">
+                          API Key
+                        </Label>
+                        {apiKey && (
+                          <span className="text-[10px] bg-lumi-primary/10 text-lumi-primary px-1.5 py-0.5 rounded-full">
+                            Key entered
+                          </span>
+                        )}
+                      </div>
+                      <div className="relative">
+                        <div className="relative">
+                          <Input
+                            id="apiKey"
+                            type={showApiKey ? 'text' : 'password'}
+                            placeholder="sk-or-v1-..."
+                            value={apiKey}
+                            onChange={(e) => setApiKey(e.target.value)}
+                            className="font-mono text-sm h-9 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 pr-10"
+                            autoComplete="off"
+                            spellCheck={false}
+                            onKeyDown={(e) => e.key === 'Enter' && handleApiKeySave()}
+                          />
+                          {apiKey && (
+                            <button
+                              type="button"
+                              onClick={() => setShowApiKey(!showApiKey)}
+                              className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-1"
+                              tabIndex={-1}
+                            >
+                              {showApiKey ? (
+                                <EyeOff className="h-4 w-4" />
+                              ) : (
+                                <Eye className="h-4 w-4" />
+                              )}
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                      <p className="mt-1 text-[11px] text-gray-500 dark:text-gray-500 flex items-start">
+                        <Info className="h-3 w-3 text-lumi-primary mr-1 mt-0.5 flex-shrink-0" />
+                        Stored locally, never shared
+                      </p>
+                    </div>
 
-                  <div className="flex flex-col sm:flex-row justify-between gap-3 pt-2">
-                    <Button 
-                      variant="outline" 
-                      onClick={() => setIsApiKeyDialogOpen(false)}
-                      className="w-full sm:w-auto"
-                    >
-                      Cancel
-                    </Button>
-                    <Button 
-                      variant="outline"
-                      onClick={handleApiKeySave}
-                      disabled={!apiKey.trim()}
-                      className="w-full sm:w-auto"
-                    >
-                      Save API Key
-                    </Button>
+                    <div className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-2.5 text-xs border border-gray-200 dark:border-gray-700">
+                      <h4 className="font-medium text-gray-900 dark:text-white mb-1 flex items-center text-sm">
+                        <Key className="h-3.5 w-3.5 text-lumi-primary mr-1.5" />
+                        How to get your API key:
+                      </h4>
+                      <ol className="space-y-1 text-gray-700 dark:text-gray-300 text-xs">
+                        <li className="flex items-start">
+                          <span className="text-lumi-primary font-bold w-4 flex-shrink-0">1.</span>
+                          <div>
+                            <a 
+                              href="https://openrouter.ai/keys" 
+                              target="_blank" 
+                              rel="noopener noreferrer" 
+                              className="text-lumi-primary hover:underline font-semibold inline-flex items-center"
+                            >
+                              Sign in to OpenRouter
+                              <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="ml-0.5">
+                                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                                <polyline points="15 3 21 3 21 9"></polyline>
+                                <line x1="10" y1="14" x2="21" y2="3"></line>
+                              </svg>
+                            </a>
+                            <p className="text-[10px] text-gray-500 dark:text-gray-400 leading-none mt-0.5">
+                              Create an account if you don't have one
+                            </p>
+                          </div>
+                        </li>
+                        <li className="flex items-start">
+                          <span className="text-lumi-primary font-bold w-4 flex-shrink-0">2.</span>
+                          <div>
+                            <span className="font-semibold">Create a new API key</span>
+                            <p className="text-[10px] text-gray-500 dark:text-gray-400 leading-none mt-0.5">
+                              Click "Create a key" and name it (e.g., "Lyra Chat")
+                            </p>
+                          </div>
+                        </li>
+                        <li className="flex items-start">
+                          <span className="text-lumi-primary font-bold w-4 flex-shrink-0">3.</span>
+                          <div>
+                            <span className="font-semibold">Copy & paste below</span>
+                            <p className="text-[10px] text-gray-500 dark:text-gray-400 leading-none mt-0.5">
+                              Look for a key starting with <code className="bg-gray-200 dark:bg-gray-700/50 px-1 py-0.5 rounded text-[9px] font-mono">sk-or-</code>
+                            </p>
+                          </div>
+                        </li>
+                      </ol>
+                    </div>
+
+                    <div className="flex gap-2 pt-1">
+                      <Button 
+                        variant="outline" 
+                        onClick={() => setIsApiKeyDialogOpen(false)}
+                        className="flex-1 h-8 text-xs"
+                      >
+                        Cancel
+                      </Button>
+                      <Button 
+                        variant="outline"
+                        onClick={handleApiKeySave}
+                        disabled={!apiKey.trim()}
+                        className={`flex-1 h-8 text-xs border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800 ${
+                          apiKey.trim() ? 'ring-1 ring-white dark:ring-white ring-offset-0' : ''
+                        }`}
+                      >
+                        Save Key
+                      </Button>
+                    </div>
                   </div>
                 </div>
               </DialogContent>
             </Dialog>
 
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={onThemeToggle}
-              className="rounded-full hover:bg-lumi-surface/50 dark:hover:bg-lumi-surface/30 transition-colors relative group h-8 w-8 sm:h-9 sm:w-9 flex items-center justify-center"
-              title={theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
-            >
-              <div className="relative w-5 h-5 flex items-center justify-center">
-                <Sun 
-                  className={`h-4 w-4 sm:h-5 sm:w-5 text-yellow-500 transition-all duration-300 ${
-                    theme === 'light' ? 'opacity-100 rotate-0' : 'opacity-0 -rotate-45 absolute'
-                  }`} 
-                />
-                <Moon 
-                  className={`h-4 w-4 sm:h-5 sm:w-5 text-lumi-primary transition-all duration-300 ${
-                    theme === 'dark' ? 'opacity-100 rotate-0' : 'opacity-0 rotate-45 absolute'
-                  }`} 
-                />
-              </div>
-              <span className="sr-only">
-                {theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
-              </span>
-            </Button>
+            <ThemeToggle />
           </div>
         </div>
       </div>

@@ -95,12 +95,10 @@ export const ModelSelector = ({
         onClick={() => setIsOpen(!isOpen)}
         className={`
           group flex items-center justify-between w-full h-10 px-3 py-2
-          rounded-lg border border-border/70 dark:border-border/70
-          bg-transparent hover:bg-accent/10
-          hover:border-primary/50 dark:hover:border-primary/50
-          focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background
+          rounded-md
+          bg-transparent hover:bg-accent/5 dark:hover:bg-accent/10
+          focus:outline-none focus:ring-0
           transition-all duration-200 ease-out
-          ${isOpen ? 'ring-2 ring-ring/50 ring-offset-2 ring-offset-background' : ''}
         `}
         aria-haspopup="listbox"
         aria-expanded={isOpen}
@@ -131,14 +129,14 @@ export const ModelSelector = ({
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
             className={`
               fixed sm:absolute left-4 right-4 sm:left-auto sm:right-auto sm:w-[280px] z-50 mt-1 py-1 shadow-lg
-              bg-white dark:bg-gray-900 border rounded-lg border-border focus:outline-none
+              bg-white dark:bg-black border border-gray-200 dark:border-gray-800 rounded-lg focus:outline-none
               ${isOpen ? 'block' : 'hidden'} overflow-hidden
               max-h-[70vh] overflow-y-auto
             `}
             role="listbox"
             aria-label="Available models"
           >
-            <div className="py-1.5 text-xs font-medium text-muted-foreground/70 px-3 mb-1 sticky top-0 bg-white dark:bg-gray-900 z-10 border-b border-border">
+            <div className="py-1.5 text-xs font-medium text-muted-foreground/70 px-3 mb-1 sticky top-0 bg-white dark:bg-black z-10 border-b border-gray-200 dark:border-gray-800">
               Select a model
             </div>
             {AVAILABLE_MODELS.map((model) => (
@@ -179,7 +177,7 @@ export const ModelSelector = ({
                       </span>
                     )}
                   </div>
-                  <div className="text-xs text-lumi-secondary/60 dark:text-lumi-secondary/60 truncate">
+                  <div className="text-xs text-gray-500 dark:text-gray-400 truncate">
                     {model.description}
                   </div>
                 </div>

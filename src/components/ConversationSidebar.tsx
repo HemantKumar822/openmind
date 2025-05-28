@@ -125,7 +125,7 @@ export const ConversationSidebar = ({
     <>
       {/* Overlay */}
       <div 
-        className={`fixed inset-0 bg-black/50 dark:bg-black/60 z-40 transition-opacity duration-300 ${
+        className={`fixed inset-0 bg-black/90 z-40 transition-opacity duration-300 ${
           isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
         }`}
         onClick={onClose}
@@ -134,7 +134,7 @@ export const ConversationSidebar = ({
       
       {/* Sidebar */}
       <aside 
-        className={`fixed top-0 left-0 h-full w-72 bg-white dark:bg-[#1a1d21] shadow-xl z-50 transform transition-transform duration-300 ease-in-out ${
+        className={`fixed top-0 left-0 h-full w-72 bg-white dark:bg-black shadow-xl z-50 transform transition-transform duration-300 ease-in-out ${
           isOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
         aria-label="Conversation history"
@@ -145,7 +145,7 @@ export const ConversationSidebar = ({
             <h2 className="text-lg font-semibold text-lumi-primary dark:text-blue-400">Conversations</h2>
             <button 
               onClick={onClose}
-              className="p-1.5 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors"
+              className="p-1.5 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
               aria-label="Close sidebar"
             >
               <X className="h-5 w-5 text-gray-500 dark:text-gray-400" />
@@ -159,7 +159,7 @@ export const ConversationSidebar = ({
                 onNewChat();
                 onClose();
               }}
-              className="w-full flex items-center justify-center h-10 px-4 py-2 bg-blue-600 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-500 text-white font-medium rounded-md transition-colors duration-200 shadow-sm border border-blue-700 dark:border-blue-500 hover:border-blue-800 dark:hover:border-blue-400"
+              className="w-full flex items-center justify-center h-10 px-4 py-2 bg-blue-600 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-700 text-white font-medium rounded-md transition-colors duration-200 shadow-sm"
             >
               <Plus className="mr-2 h-4 w-4" />
               New Chat
@@ -185,8 +185,8 @@ export const ConversationSidebar = ({
                     }}
                     className={`w-full text-left p-2.5 rounded-md flex items-center justify-between group transition-colors duration-150 cursor-pointer ${
                       conversation.id === currentConversationId
-                        ? 'bg-blue-50 dark:bg-gray-700/70 text-blue-700 dark:text-white font-medium'
-                        : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700/50 hover:text-gray-900 dark:hover:text-white'
+                        ? 'bg-blue-100 dark:bg-gray-800 text-blue-700 dark:text-white font-medium'
+                        : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white'
                     }`}
                   >
                     <div className="flex-1 min-w-0 flex items-center">

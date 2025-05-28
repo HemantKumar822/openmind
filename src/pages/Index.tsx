@@ -1,5 +1,6 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { useTheme } from '@/hooks/useTheme';
 import { motion } from 'framer-motion';
 import { v4 as uuidv4 } from 'uuid';
 import { Header } from '@/components/Header';
@@ -13,81 +14,13 @@ import { useToast } from '@/hooks/use-toast';
 import { addConversation, Conversation } from '@/components/ConversationSidebar';
 
 const Index = () => {
-  // Initialize theme state
-  const [theme, setThemeState] = useState<ThemePreference>(storageUtils.getTheme());
-  const [resolvedTheme, setResolvedTheme] = useState<'light' | 'dark'>(storageUtils.getResolvedTheme());
+  // Initialize theme state using the useTheme hook
+  const { theme, resolvedTheme, setTheme } = useTheme();
   
-  // Update theme in state and storage
-  const setTheme = useCallback((newTheme: ThemePreference) => {
-    console.log('Setting theme to:', newTheme);
-    setThemeState(newTheme);
-    storageUtils.setTheme(newTheme);
-    
-    // Update the resolved theme
-    const resolved = newTheme === 'system' ? storageUtils.getSystemTheme() : newTheme;
-    console.log('Resolved theme:', resolved);
-    setResolvedTheme(resolved);
-    
-    // Update the document class for Tailwind
-    if (resolved === 'dark') {
-      console.log('Adding dark class to html element');
-      document.documentElement.classList.add('dark');
-      document.documentElement.setAttribute('data-theme', 'dark');
-      document.documentElement.style.colorScheme = 'dark';
-    } else {
-      console.log('Removing dark class from html element');
-      document.documentElement.classList.remove('dark');
-      document.documentElement.setAttribute('data-theme', 'light');
-      document.documentElement.style.colorScheme = 'light';
-    }
-  }, []);
-  
-  // Handle system theme changes
-  useEffect(() => {
-    console.log('Initializing theme system');
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    
-    const handleSystemThemeChange = (e: MediaQueryListEvent) => {
-      console.log('System theme changed, current theme setting:', theme);
-      // Only update if we're using system theme
-      if (theme === 'system') {
-        const newTheme = e.matches ? 'dark' : 'light';
-        console.log('Setting resolved theme from system:', newTheme);
-        setResolvedTheme(newTheme);
-        if (newTheme === 'dark') {
-          console.log('Adding dark class (system change)');
-          document.documentElement.classList.add('dark');
-          document.documentElement.setAttribute('data-theme', 'dark');
-          document.documentElement.style.colorScheme = 'dark';
-        } else {
-          console.log('Removing dark class (system change)');
-          document.documentElement.classList.remove('dark');
-          document.documentElement.setAttribute('data-theme', 'light');
-          document.documentElement.style.colorScheme = 'light';
-        }
-      }
-    };
-    
-    // Set initial theme
-    const resolved = storageUtils.getResolvedTheme();
-    console.log('Initial resolved theme:', resolved);
-    setResolvedTheme(resolved);
-    if (resolved === 'dark') {
-      console.log('Adding dark class (initial)');
-      document.documentElement.classList.add('dark');
-      document.documentElement.setAttribute('data-theme', 'dark');
-      document.documentElement.style.colorScheme = 'dark';
-    } else {
-      console.log('Removing dark class (initial)');
-      document.documentElement.classList.remove('dark');
-      document.documentElement.setAttribute('data-theme', 'light');
-      document.documentElement.style.colorScheme = 'light';
-    }
-    
-    // Listen for system theme changes
-    mediaQuery.addEventListener('change', handleSystemThemeChange);
-    return () => mediaQuery.removeEventListener('change', handleSystemThemeChange);
-  }, [theme]);
+  // Toggle theme function for the header
+  const toggleTheme = useCallback(() => {
+    setTheme(theme === 'dark' ? 'light' : 'dark');
+  }, [theme, setTheme]);
   const [selectedModel, setSelectedModel] = useState<string>(
     storageUtils.getSelectedModel() || AVAILABLE_MODELS[1].id
   );
@@ -98,6 +31,8 @@ const Index = () => {
     storageUtils.getCurrentChat()?.id || null
   );
   const [isLoading, setIsLoading] = useState(false);
+  const abortControllerRef = useRef<AbortController | null>(null);
+  const currentAssistantMessageId = useRef<string | null>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
   
@@ -229,6 +164,7 @@ const Index = () => {
 
     // Create a unique ID for the assistant message
     const assistantMessageId = `msg-${Date.now()}`;
+    currentAssistantMessageId.current = assistantMessageId;
     const initialTimestamp = Date.now();
     let fullResponse = '';
     
@@ -252,7 +188,13 @@ const Index = () => {
     setCurrentChat(initialChat);
     setIsLoading(true);
     const openRouter = new OpenRouterClient(apiKey);
+    // Cancel any existing requests
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+    
     const abortController = new AbortController();
+    abortControllerRef.current = abortController;
     let isStreaming = true;
     let hasError = false;
     let scrollInterval: NodeJS.Timeout | null = null;
@@ -262,7 +204,9 @@ const Index = () => {
     // Cleanup function
     const cleanup = () => {
       isStreaming = false;
-      abortController.abort();
+      if (abortControllerRef.current === abortController) {
+        abortControllerRef.current = null;
+      }
       setIsLoading(false);
     };
 
@@ -278,6 +222,7 @@ const Index = () => {
 
     // Scroll to bottom when streaming starts
     setTimeout(scrollToBottom, 100);
+    
 
     try {
       const modelName = AVAILABLE_MODELS.find(m => m.id === selectedModel)?.name || 'AI Assistant';
@@ -380,7 +325,6 @@ const Index = () => {
           return finalChat;
         });
       }
-
     } catch (error) {
       hasError = true;
       console.error('Error in streaming:', error);
@@ -423,59 +367,96 @@ const Index = () => {
     }
   };
 
+  // Handle stopping the generation
+  const handleStopGeneration = useCallback(() => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+      abortControllerRef.current = null;
+      setIsLoading(false);
+      
+      // Update the last message to remove the streaming state
+      if (currentAssistantMessageId.current) {
+        setCurrentChat(prev => {
+          if (!prev) return prev;
+          
+          const messageIndex = prev.messages.findIndex(m => m.id === currentAssistantMessageId.current);
+          if (messageIndex === -1) return prev;
+          
+          const newMessages = [...prev.messages];
+          newMessages[messageIndex] = {
+            ...newMessages[messageIndex],
+            isStreaming: false,
+            timestamp: Date.now()
+          };
+          
+          return {
+            ...prev,
+            messages: newMessages,
+            updatedAt: Date.now()
+          };
+        });
+      }
+    }
+  }, []);
+
   // Show welcome screen only when there are no messages in the current chat
   const showWelcomeScreen = !currentChat || currentChat.messages.length === 0;
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-background to-lumi-surface/30 w-full">
-      <Header
-        selectedModel={selectedModel}
-        onModelChange={handleModelChange}
-        onNewChat={handleNewChat}
-        theme={theme}
-        onThemeToggle={handleThemeToggle}
-        currentConversationId={currentConversationId}
-        onConversationChange={handleConversationChange}
-      />
-      
-      {/* Chat area with fixed height and scrolling */}
-      <main className="flex-1 flex flex-col min-h-0 w-full">
-        {showWelcomeScreen ? (
-          <WelcomeScreen />
-        ) : (
-          <div
-            ref={chatContainerRef}
-            className="flex-1 w-full overflow-y-auto scrollbar-thin scrollbar-thumb-lumi-border/30 scrollbar-track-transparent hover:scrollbar-thumb-lumi-border/50"
-            style={{
-              height: 'calc(100vh - 4rem - 4.5rem)', // Account for header and input heights
-              scrollBehavior: 'smooth',
-              scrollPadding: '1rem',
-              WebkitOverflowScrolling: 'touch', // Smooth scrolling on iOS
-            }}
-          >
-            <div className="container mx-auto max-w-4xl px-2 sm:px-4 py-4 w-full">
-              <div className="space-y-2 sm:space-y-3 w-full">
-                {currentChat?.messages.map((message) => (
-                  <div key={message.id} className="w-full">
-                    <ChatMessage message={message} />
-                  </div>
-                ))}
-              </div>
-              
-              {/* Empty space at the bottom to prevent content from being hidden behind the input */}
-              <div className="h-24 sm:h-20 w-full" />
-            </div>
-          </div>
-        )}
-      </main>
-
-      {/* Fixed chat input at bottom */}
-      <div className="sticky bottom-0 z-10">
-        <ChatInput
-          onSendMessage={handleSendMessage}
-          disabled={isLoading}
-          placeholder={hasMessages ? "Continue the conversation..." : "Start your conversation with Lyra..."}
+    <div className="min-h-screen flex flex-col bg-white dark:bg-black w-full">
+      <div className="flex-1 flex flex-col w-full max-w-[2000px] mx-auto">
+        <Header
+          selectedModel={selectedModel}
+          onModelChange={handleModelChange}
+          onNewChat={handleNewChat}
+          theme={theme}
+          onThemeToggle={toggleTheme}
+          currentConversationId={currentConversationId}
+          onConversationChange={handleConversationChange}
         />
+        
+        {/* Chat area with fixed height and scrolling */}
+        <main className="flex-1 flex flex-col w-full">
+          {showWelcomeScreen ? (
+            <WelcomeScreen />
+          ) : (
+            <div
+              ref={chatContainerRef}
+              className="flex-1 w-full overflow-y-auto scrollbar-thin scrollbar-thumb-lumi-border/30 scrollbar-track-transparent hover:scrollbar-thumb-lumi-border/50"
+              style={{
+                height: 'calc(100vh - 4rem - 4.5rem)', // Account for header and input heights
+                scrollBehavior: 'smooth',
+                scrollPadding: '1rem',
+                WebkitOverflowScrolling: 'touch',
+              }}
+            >
+              <div className="w-full max-w-4xl mx-auto px-2 sm:px-4 lg:px-6 py-4">
+                <div className="space-y-2 sm:space-y-3 w-full">
+                  {currentChat?.messages.map((message) => (
+                    <div key={message.id} className="w-full">
+                      <ChatMessage message={message} />
+                    </div>
+                  ))}
+                </div>
+                {/* Empty space at the bottom to prevent content from being hidden behind the input */}
+                <div className="h-24 sm:h-20 w-full" />
+              </div>
+            </div>
+          )}
+        </main>
+
+        {/* Fixed chat input at bottom */}
+        <div className="sticky bottom-0 z-10 bg-white/80 dark:bg-black/80 backdrop-blur-sm">
+          <div className="w-full max-w-4xl mx-auto px-2 sm:px-4 lg:px-6">
+            <ChatInput
+              onSendMessage={handleSendMessage}
+              onStopGeneration={handleStopGeneration}
+              disabled={isLoading}
+              isStreaming={isLoading}
+              placeholder={hasMessages ? "Continue the conversation..." : "Start your conversation with Lyra..."}
+            />
+          </div>
+        </div>
       </div>
     </div>
   );
