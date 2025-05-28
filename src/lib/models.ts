@@ -16,11 +16,11 @@ export const AVAILABLE_MODELS: Model[] = [
     provider: "DeepSeek"
   },
   {
-    id: "google/gemma-3n-e4b-it:free",
-    name: "Gemma 3n 4B",
-    description: "Fast and efficient multimodal model with great instruction-following ability",
-    guidance: "Great for fast responses and multimodal or API tool-based tasks",
-    provider: "Google"
+    id: "meta-llama/llama-4-maverick:free",
+    name: "Llama 4 Maverick",
+    description: "A high-capacity multimodal language model from Meta, built on a mixture-of-experts (MoE) architecture",
+    guidance: "Best for fast responses and multimodal or API tool-based tasks",
+    provider: "Meta"
   },
   {
     id: "qwen/qwen3-235b-a22b:free",
