@@ -134,7 +134,7 @@ export const ConversationSidebar = ({
       
       {/* Sidebar */}
       <aside 
-        className={`fixed top-0 left-0 h-full w-72 bg-white dark:bg-black shadow-xl z-50 transform transition-transform duration-300 ease-in-out ${
+        className={`fixed top-0 left-0 h-full w-60 bg-white dark:bg-black shadow-xl z-50 transform transition-transform duration-300 ease-in-out ${
           isOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
         aria-label="Conversation history"
@@ -142,7 +142,7 @@ export const ConversationSidebar = ({
         <div className="flex flex-col h-full">
           {/* Header */}
           <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700/60">
-            <h2 className="text-lg font-semibold text-lumi-primary dark:text-blue-400">Conversations</h2>
+            <h2 className="text-lg font-semibold text-openmind-primary dark:text-blue-400">Conversations</h2>
             <button 
               onClick={onClose}
               className="p-1.5 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
@@ -241,7 +241,7 @@ export const ConversationSidebar = ({
                       </button>
                       <button
                         onClick={(e) => handleDelete(conversation.id, e)}
-                        className="p-1 rounded hover:bg-lumi-surface/70 text-red-500 hover:text-red-600"
+                        className="p-1 rounded hover:bg-openmind-surface/70 text-red-500 hover:text-red-600"
                         title="Delete"
                       >
                         <Trash2 className="h-3.5 w-3.5" />
@@ -254,8 +254,8 @@ export const ConversationSidebar = ({
           </div>
           
           {/* Footer */}
-          <div className="p-4 border-t border-lumi-border/30">
-            <div className="flex flex-col items-center justify-center space-y-1 text-xs text-lumi-secondary/60">
+          <div className="p-4 border-t border-openmind-border/30">
+            <div className="flex flex-col items-center justify-center space-y-1 text-xs text-openmind-secondary/60">
               <div className="flex items-center">
                 <span>Made with</span>
                 <svg 
@@ -271,8 +271,8 @@ export const ConversationSidebar = ({
                 </svg>
                 <span>by Hemant</span>
               </div>
-              <div className="text-lumi-secondary/40">
-                Powered by OpenRouter
+              <div className="text-openmind-secondary/40">
+                Beta V1.0.0 | Powered by OpenRouter
               </div>
             </div>
           </div>
@@ -283,7 +283,7 @@ export const ConversationSidebar = ({
 };
 
 export const addConversation = (conversation: Omit<Conversation, 'isPinned'>) => {
-  const saved = localStorage.getItem('lumi-conversations');
+  const saved = localStorage.getItem('openmind_conversations');
   let conversations: Conversation[] = [];
   
   if (saved) {
@@ -302,18 +302,18 @@ export const addConversation = (conversation: Omit<Conversation, 'isPinned'>) =>
     conversations.unshift({ ...conversation, isPinned: false });
   }
   
-  localStorage.setItem('lumi-conversations', JSON.stringify(conversations));
+  localStorage.setItem('openmind_conversations', JSON.stringify(conversations));
 };
 
 export const getConversation = (id: string): Conversation | undefined => {
-  const saved = localStorage.getItem('lumi-conversations');
+  const saved = localStorage.getItem('openmind_conversations');
   if (!saved) return undefined;
   
   try {
     const conversations: Conversation[] = JSON.parse(saved);
-    return conversations.find(c => c.id === id);
+    return conversations.find(conv => conv.id === id);
   } catch (e) {
-    console.error('Failed to parse conversations', e);
+    console.error('Error parsing conversations', e);
     return undefined;
   }
 };

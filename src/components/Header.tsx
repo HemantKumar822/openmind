@@ -42,7 +42,7 @@ export const Header = ({
   // Update conversation title when it changes
   useEffect(() => {
     if (currentConversationId) {
-      const saved = localStorage.getItem('lumi-conversations');
+      const saved = localStorage.getItem('openmind_conversations');
       if (saved) {
         try {
           const conversations: Conversation[] = JSON.parse(saved);
@@ -109,11 +109,11 @@ export const Header = ({
               <button 
                 type="button" 
                 onClick={toggleSidebar}
-                className="flex-shrink-0 flex items-center justify-center h-9 w-9 rounded-md hover:bg-gray-100 dark:hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-lumi-primary/50 transition-colors duration-200" 
+                className="flex-shrink-0 flex items-center justify-center h-9 w-9 rounded-md hover:bg-gray-100 dark:hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-openmind-primary/50 transition-colors duration-200" 
                 title="Menu"
                 aria-label="Toggle menu"
               >
-                <Menu className="h-6 w-6 text-lumi-primary" />
+                <Menu className="h-6 w-6 text-openmind-primary" />
               </button>
             </div>
             
@@ -144,7 +144,7 @@ export const Header = ({
               variant="ghost"
               size="icon"
               onClick={handleNewChat}
-              className="hover:bg-gray-100 dark:hover:bg-[#111] h-8 w-8 sm:h-9 sm:w-9 text-lumi-primary hover:text-lumi-primary/90 transition-colors"
+              className="hover:bg-gray-100 dark:hover:bg-[#111] h-8 w-8 sm:h-9 sm:w-9 text-openmind-primary hover:text-openmind-primary/90 transition-colors"
               title="New Chat"
             >
               <MessageSquarePlus className="h-4 w-4 sm:h-5 sm:w-5" />
@@ -155,7 +155,7 @@ export const Header = ({
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="hover:bg-gray-100 dark:hover:bg-gray-900 h-8 w-8 sm:h-9 sm:w-9 text-lumi-primary hover:text-lumi-primary/90 transition-colors"
+                  className="hover:bg-gray-100 dark:hover:bg-gray-900 h-8 w-8 sm:h-9 sm:w-9 text-openmind-primary hover:text-openmind-primary/90 transition-colors"
                   title="API Key"
                 >
                   <Key className="h-4 w-4 sm:h-5 sm:w-5" />
@@ -167,8 +167,8 @@ export const Header = ({
               >
                 <div className="p-4 sm:p-5">
                   <div className="flex items-start gap-3 mb-4">
-                    <div className="p-1.5 rounded-lg bg-lumi-primary/10 mt-0.5">
-                      <Key className="h-4 w-4 text-lumi-primary" />
+                    <div className="p-1.5 rounded-lg bg-openmind-primary/10 mt-0.5">
+                      <Key className="h-4 w-4 text-openmind-primary" />
                     </div>
                     <div>
                       <h3 className="font-semibold text-gray-900 dark:text-white text-base">OpenRouter API Key</h3>
@@ -183,7 +183,7 @@ export const Header = ({
                           API Key
                         </Label>
                         {apiKey && (
-                          <span className="text-[10px] bg-lumi-primary/10 text-lumi-primary px-1.5 py-0.5 rounded-full">
+                          <span className="text-[10px] bg-openmind-primary/10 text-openmind-primary px-1.5 py-0.5 rounded-full">
                             Key entered
                           </span>
                         )}
@@ -218,25 +218,25 @@ export const Header = ({
                         </div>
                       </div>
                       <p className="mt-1 text-[11px] text-gray-500 dark:text-gray-500 flex items-start">
-                        <Info className="h-3 w-3 text-lumi-primary mr-1 mt-0.5 flex-shrink-0" />
+                        <Info className="h-3 w-3 text-openmind-primary mr-1 mt-0.5 flex-shrink-0" />
                         Stored locally, never shared
                       </p>
                     </div>
 
                     <div className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-2.5 text-xs border border-gray-200 dark:border-gray-700">
                       <h4 className="font-medium text-gray-900 dark:text-white mb-1 flex items-center text-sm">
-                        <Key className="h-3.5 w-3.5 text-lumi-primary mr-1.5" />
+                        <Key className="h-3.5 w-3.5 text-openmind-primary mr-1.5" />
                         How to get your API key:
                       </h4>
                       <ol className="space-y-1 text-gray-700 dark:text-gray-300 text-xs">
                         <li className="flex items-start">
-                          <span className="text-lumi-primary font-bold w-4 flex-shrink-0">1.</span>
+                          <span className="text-openmind-primary font-bold w-4 flex-shrink-0">1.</span>
                           <div>
                             <a 
                               href="https://openrouter.ai/keys" 
                               target="_blank" 
                               rel="noopener noreferrer" 
-                              className="text-lumi-primary hover:underline font-semibold inline-flex items-center"
+                              className="text-openmind-primary hover:underline font-semibold inline-flex items-center"
                             >
                               Sign in to OpenRouter
                               <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="ml-0.5">
@@ -251,16 +251,16 @@ export const Header = ({
                           </div>
                         </li>
                         <li className="flex items-start">
-                          <span className="text-lumi-primary font-bold w-4 flex-shrink-0">2.</span>
+                          <span className="text-openmind-primary font-bold w-4 flex-shrink-0">2.</span>
                           <div>
                             <span className="font-semibold">Create a new API key</span>
                             <p className="text-[10px] text-gray-500 dark:text-gray-400 leading-none mt-0.5">
-                              Click "Create a key" and name it (e.g., "Lyra Chat")
+                              Click "Create a key" and name it (e.g., "OpenMind Chat")
                             </p>
                           </div>
                         </li>
                         <li className="flex items-start">
-                          <span className="text-lumi-primary font-bold w-4 flex-shrink-0">3.</span>
+                          <span className="text-openmind-primary font-bold w-4 flex-shrink-0">3.</span>
                           <div>
                             <span className="font-semibold">Copy & paste below</span>
                             <p className="text-[10px] text-gray-500 dark:text-gray-400 leading-none mt-0.5">

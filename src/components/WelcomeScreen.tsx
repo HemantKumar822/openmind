@@ -40,18 +40,21 @@ export const WelcomeScreen = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: 'easeOut' }}
         >
-          <h1 
-            className="text-7xl sm:text-8xl md:text-9xl font-black tracking-tight bg-gradient-to-r from-blue-500 via-purple-500 to-orange-400 bg-clip-text text-transparent drop-shadow-lg" 
-            style={{
-              backgroundSize: '200% auto',
-              animation: 'gradient 8s ease infinite',
-              lineHeight: '1',
-              marginBottom: '0.5rem',
-              textShadow: '0 2px 4px rgba(0,0,0,0.1)'
-            }}
-          >
-            LYRA
-          </h1>
+          <div className="flex justify-center">
+            <h1 
+              className="text-5xl sm:text-7xl md:text-8xl font-black tracking-tight bg-gradient-to-r from-blue-500 via-purple-500 to-orange-400 bg-clip-text text-transparent drop-shadow-lg flex items-center justify-center gap-2 sm:gap-4" 
+              style={{
+                backgroundSize: '200% auto',
+                animation: 'gradient 8s ease infinite',
+                lineHeight: '1',
+                marginBottom: '0.5rem',
+                textShadow: '0 2px 4px rgba(0,0,0,0.1)'
+              }}
+            >
+              <span>OPEN</span>
+              <span>MIND</span>
+            </h1>
+          </div>
           <motion.div 
             className="w-full mt-3 px-4"
             initial={{ opacity: 0, y: 10 }}
@@ -59,7 +62,7 @@ export const WelcomeScreen = () => {
             transition={{ delay: 0.1, duration: 0.5 }}
           >
             <p className="text-lg sm:text-2xl font-medium text-muted-foreground/80 tracking-normal font-sans text-center leading-tight">
-              A constellation of models, unified through simplicity
+              Open access to intelligence for everyone.
             </p>
           </motion.div>
         </motion.div>

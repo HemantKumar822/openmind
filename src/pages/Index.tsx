@@ -22,7 +22,7 @@ const Index = () => {
     setTheme(theme === 'dark' ? 'light' : 'dark');
   }, [theme, setTheme]);
   const [selectedModel, setSelectedModel] = useState<string>(
-    storageUtils.getSelectedModel() || AVAILABLE_MODELS[1].id
+    storageUtils.getSelectedModel() || AVAILABLE_MODELS[0].id
   );
   const [currentChat, setCurrentChat] = useState<ChatSession | null>(
     storageUtils.getCurrentChat()
@@ -422,7 +422,7 @@ const Index = () => {
           ) : (
             <div
               ref={chatContainerRef}
-              className="flex-1 w-full overflow-y-auto scrollbar-thin scrollbar-thumb-lumi-border/30 scrollbar-track-transparent hover:scrollbar-thumb-lumi-border/50"
+              className="flex-1 w-full overflow-y-auto scrollbar-thin scrollbar-thumb-openmind-border/30 scrollbar-track-transparent hover:scrollbar-thumb-openmind-border/50"
               style={{
                 height: 'calc(100vh - 4rem - 4.5rem)', // Account for header and input heights
                 scrollBehavior: 'smooth',
@@ -453,7 +453,7 @@ const Index = () => {
               onStopGeneration={handleStopGeneration}
               disabled={isLoading}
               isStreaming={isLoading}
-              placeholder={hasMessages ? "Continue the conversation..." : "Start your conversation with Lyra..."}
+              placeholder={hasMessages ? "Continue the conversation..." : "Start your conversation with OpenMind..."}
             />
           </div>
         </div>

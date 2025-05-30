@@ -12,6 +12,22 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
+        // OpenMind color variables
+        openmind: {
+          primary: 'var(--openmind-primary)',
+          'primary-hover': 'var(--openmind-primary-hover)',
+          surface: 'var(--openmind-surface)',
+          'surface-hover': 'var(--openmind-surface-hover)',
+          border: 'var(--openmind-border)',
+          'border-hover': 'var(--openmind-border-hover)',
+          secondary: 'var(--openmind-secondary)',
+          muted: 'var(--openmind-muted)',
+          accent: 'var(--openmind-accent)',
+          'accent-foreground': 'var(--openmind-accent-foreground)',
+          destructive: 'var(--openmind-destructive)',
+          'destructive-foreground': 'var(--openmind-destructive-foreground)',
+          ring: 'var(--openmind-ring)',
+        },
         // Primary brand color
         primary: {
           50: '#f0f9ff',

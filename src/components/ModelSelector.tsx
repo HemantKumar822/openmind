@@ -172,7 +172,7 @@ export const ModelSelector = ({
                       {model.name}
                     </span>
                     {model.id.includes('latest') && (
-                      <span className="ml-2 px-1.5 py-0.5 text-[10px] font-medium rounded bg-lumi-primary/10 text-lumi-primary">
+                      <span className="ml-2 px-1.5 py-0.5 text-[10px] font-medium rounded bg-openmind-primary/10 text-openmind-primary">
                         New
                       </span>
                     )}
@@ -182,10 +182,10 @@ export const ModelSelector = ({
                   </div>
                 </div>
                 {model.id === selectedModel && (
-                  <Check className="h-4 w-4 text-lumi-primary flex-shrink-0 ml-2" />
+                  <Check className="h-4 w-4 text-openmind-primary flex-shrink-0 ml-2" />
                 )}
                 <div 
-                  className="absolute inset-0 rounded-md ring-2 ring-offset-2 ring-lumi-primary/30 opacity-0 group-hover:opacity-100 transition-opacity"
+                  className="absolute inset-0 rounded-md ring-2 ring-offset-2 ring-openmind-primary/30 opacity-0 group-hover:opacity-100 transition-opacity"
                   aria-hidden="true"
                 />
               </div>

@@ -71,7 +71,7 @@ export class OpenRouterClient {
           'Authorization': `Bearer ${this.apiKey}`,
           'Content-Type': 'application/json',
           'HTTP-Referer': window.location.origin,
-          'X-Title': 'Lyra - A constellation of models, unified through simplicity'
+          'X-Title': 'OpenMind - Open access to intelligence for everyone.'
         },
         body: JSON.stringify({
           model: modelId,

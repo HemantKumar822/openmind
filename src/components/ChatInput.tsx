@@ -54,9 +54,9 @@ export const ChatInput = ({
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder={disabled ? "Lyra is thinking..." : "Ask anything..."}
+          placeholder={disabled ? "OpenMind is thinking..." : "Ask anything..."}
           disabled={disabled}
-          className="w-full min-h-[48px] sm:min-h-[56px] max-h-[200px] sm:max-h-[280px] resize-none border-2 border-gray-200 dark:border-gray-700 text-base sm:text-[15.5px] rounded-2xl shadow-sm bg-white dark:bg-gray-900/80 pl-4 sm:pl-5 pr-12 sm:pr-14 py-3 font-medium placeholder:text-gray-500/60 dark:placeholder:text-gray-500/70 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500/50 transition-all duration-200 ease-in-out backdrop-blur-sm overflow-y-auto overscroll-contain scrollbar-hide"
+          className="w-full min-h-[48px] sm:min-h-[56px] max-h-[200px] sm:max-h-[280px] resize-none border-2 border-gray-200 dark:border-gray-700 text-base sm:text-[15.5px] rounded-2xl shadow-sm bg-white dark:bg-gray-900/80 pl-4 sm:pl-5 pr-12 sm:pr-14 py-3 font-medium placeholder:text-gray-500/60 dark:placeholder:text-gray-500/70 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500/50 transition-all duration-200 ease-in-out backdrop-blur-sm overflow-y-auto overscroll-contain [&::-webkit-scrollbar]:hidden"
           style={{
             // For better mobile experience with virtual keyboards
             WebkitAppearance: 'none',
@@ -67,8 +67,6 @@ export const ChatInput = ({
             msOverflowStyle: 'none', // IE and Edge
             WebkitOverflowScrolling: 'touch', // Smooth scrolling on iOS
           }}
-          // @ts-ignore - This is a valid attribute
-          scrollbarWidth="none"
           rows={1}
         />
         {isStreaming ? (

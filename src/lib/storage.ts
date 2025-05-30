@@ -20,11 +20,11 @@ export interface ChatSession {
 }
 
 const STORAGE_KEYS = {
-  API_KEY: 'lumi_openrouter_api_key',
-  CURRENT_CHAT: 'lumi_current_chat',
-  CHAT_HISTORY: 'lumi_chat_history',
-  THEME: 'lumi_theme',
-  SELECTED_MODEL: 'lumi_selected_model'
+  API_KEY: 'openmind_openrouter_api_key',
+  CURRENT_CHAT: 'openmind_current_chat',
+  CHAT_HISTORY: 'openmind_chat_history',
+  THEME: 'openmind_theme',
+  SELECTED_MODEL: 'openmind_selected_model'
 };
 
 export const storageUtils = {

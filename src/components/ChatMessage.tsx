@@ -141,36 +141,45 @@ function ChatMessageComponent({ message }: ChatMessageProps) {
           {children}
         </h4>
       ),
-      hr: () => <hr className="my-4 border-lumi-border/30" />,
+      hr: () => <hr className="my-4 border-openmind-border/30" />,
       table: ({ node, children, ...props }: { node?: any; children?: React.ReactNode; [key: string]: any }) => (
-        <div className="my-4 overflow-x-auto">
-          <table className="min-w-full border-collapse border border-gray-200 dark:border-black" {...props}>
+        <div className="my-6 overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm">
+          <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700" {...props}>
             {children}
           </table>
         </div>
       ),
       thead: ({ node, children, ...props }: { node?: any; children?: React.ReactNode; [key: string]: any }) => (
-        <thead className="bg-gray-100 dark:bg-black/80" {...props}>
+        <thead className="bg-gray-100 dark:bg-gray-800/80" {...props}>
           {children}
         </thead>
       ),
       tbody: ({ node, children, ...props }: { node?: any; children?: React.ReactNode; [key: string]: any }) => (
-        <tbody className="divide-y divide-gray-200 dark:divide-black" {...props}>
+        <tbody className="divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-900/50" {...props}>
           {children}
         </tbody>
       ),
       tr: ({ node, children, isHeader, ...props }: { node?: any; children?: React.ReactNode; isHeader?: boolean; [key: string]: any }) => (
-        <tr className={`hover:bg-gray-50 dark:hover:bg-black/50 transition-colors ${isHeader ? 'font-semibold' : ''}`} {...props}>
+        <tr 
+          className={`transition-colors ${isHeader ? 'font-semibold' : 'hover:bg-gray-50 dark:hover:bg-gray-800/30'}`} 
+          {...props}
+        >
           {children}
         </tr>
       ),
       th: ({ node, children, ...props }: { node?: any; children?: React.ReactNode; [key: string]: any }) => (
-        <th className="border border-gray-200 dark:border-black px-4 py-2 text-left bg-gray-50 dark:bg-black font-medium" {...props}>
+        <th 
+          className="px-4 py-3 text-left text-xs font-medium text-gray-700 dark:text-gray-300 uppercase tracking-wider border-b border-gray-200 dark:border-gray-700"
+          {...props}
+        >
           {children}
         </th>
       ),
       td: ({ node, children, ...props }: { node?: any; children?: React.ReactNode; [key: string]: any }) => (
-        <td className="border border-gray-200 dark:border-black px-4 py-2" {...props}>
+        <td 
+          className="px-4 py-3 text-sm text-gray-800 dark:text-gray-200 border-b border-gray-100 dark:border-gray-800"
+          {...props}
+        >
           {children}
         </td>
       ),

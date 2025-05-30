@@ -441,19 +441,21 @@ p {
   }
   
   /* Placeholder text */
-  &::placeholder {
+  .input::placeholder {
     color: var(--color-gray-500);
     opacity: 1;
   }
   
   /* Remove number input spinners */
-  &[type='number'] {
+  .input[type='number'] {
     -moz-appearance: textfield;
+    appearance: textfield;
   }
   
-  &::-webkit-outer-spin-button,
-  &::-webkit-inner-spin-button {
+  .input::-webkit-outer-spin-button,
+  .input::-webkit-inner-spin-button {
     -webkit-appearance: none;
+    appearance: none;
     margin: 0;
   }
 }
