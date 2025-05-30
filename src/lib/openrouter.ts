@@ -35,22 +35,26 @@ export class OpenRouterClient {
       let content = '';
       let position = 0;
       let newlineIndex;
+      let hasContent = false;
 
+      // Process complete lines in the chunk
       while ((newlineIndex = chunkData.indexOf('\n', position)) >= 0) {
-        const line = chunkData.slice(position, newlineIndex).trim();
+        const line = chunkData.slice(position, newlineIndex); // Don't trim to preserve whitespace
         position = newlineIndex + 1;
 
         if (line.startsWith('data: ')) {
           if (line === 'data: [DONE]') {
             isDone = true;
+            buffer = ''; // Clear buffer on done
             return { content: '', done: true };
           }
 
           try {
-            const data = JSON.parse(line.slice(6));
+            const data = JSON.parse(line.slice(6).trim());
             const chunkContent = data.choices?.[0]?.delta?.content || '';
             if (chunkContent) {
               content += chunkContent;
+              hasContent = true;
             }
           } catch (e) {
             console.error('Error parsing chunk:', e, 'Line:', line);
@@ -58,9 +62,14 @@ export class OpenRouterClient {
         }
       }
       
-      // Return the remaining buffer that doesn't have a complete line yet
+      // Save any remaining partial line to the buffer for the next chunk
       buffer = chunkData.slice(position);
-      return { content, done: isDone };
+      
+      // Only return content if we actually have some to avoid empty updates
+      return { 
+        content: hasContent ? content : '', 
+        done: isDone 
+      };
     };
 
     try {
@@ -104,16 +113,15 @@ export class OpenRouterClient {
         const chunk = decoder.decode(value, { stream: true });
         buffer += chunk;
         
-        // Process the buffer line by line
+        // Only process if we have complete lines or we're at the end
+        let processedSomething = false;
         while (buffer.length > 0) {
           const result = processChunk(buffer);
           
           if (result.content) {
             // Immediately yield any content we have
             yield { content: result.content, done: false };
-            
-            // Allow the event loop to process other tasks
-            await new Promise(resolve => setTimeout(resolve, 0));
+            processedSomething = true;
           }
           
           if (result.done) {
@@ -121,14 +129,13 @@ export class OpenRouterClient {
             break;
           }
           
-          // If we've processed everything, break the loop
-          if (buffer === '') {
+          // If we didn't process anything new, break to wait for more data
+          if (!processedSomething) {
             break;
           }
-        }
-        
-        if (isDone) {
-          break;
+          
+          // Small delay to prevent blocking the event loop
+          await new Promise(resolve => setTimeout(resolve, 0));
         }
       }
       
