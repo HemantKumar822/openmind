@@ -105,15 +105,32 @@ const Index = () => {
     }
   }, [currentChat]);
 
-  // Auto-scroll to bottom with smooth animation
-  useEffect(() => {
-    if (chatContainerRef.current) {
-      chatContainerRef.current.scrollTo({
-        top: chatContainerRef.current.scrollHeight,
-        behavior: 'smooth'
+  // Optimized scroll handling
+  const scrollToBottom = useCallback((behavior: ScrollBehavior = 'smooth') => {
+    if (!chatContainerRef.current) return;
+    
+    const container = chatContainerRef.current;
+    const isNearBottom = container.scrollHeight - container.scrollTop - container.clientHeight < 300;
+    
+    if (isNearBottom) {
+      // Use requestAnimationFrame for smoother animations
+      requestAnimationFrame(() => {
+        container.scrollTo({
+          top: container.scrollHeight,
+          behavior: behavior === 'auto' ? 'auto' : 'smooth'
+        });
       });
     }
-  }, [currentChat?.messages]);
+  }, []);
+  
+  // Only scroll on message length change
+  const prevMessagesLength = useRef(0);
+  useEffect(() => {
+    if (currentChat?.messages.length !== prevMessagesLength.current) {
+      prevMessagesLength.current = currentChat?.messages.length || 0;
+      scrollToBottom('auto');
+    }
+  }, [currentChat?.messages.length, scrollToBottom]);
 
   const handleThemeToggle = useCallback(() => {
     // Toggle between light and dark themes only
@@ -188,6 +205,7 @@ const Index = () => {
     setCurrentChat(initialChat);
     setIsLoading(true);
     const openRouter = new OpenRouterClient(apiKey);
+    
     // Cancel any existing requests
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
@@ -198,32 +216,49 @@ const Index = () => {
     let isStreaming = true;
     let hasError = false;
     let scrollInterval: NodeJS.Timeout | null = null;
-    let lastUpdateTime = 0;
-    const UPDATE_THROTTLE_MS = 50; // Update UI at most every 50ms
-
+    
+    // Initialize streaming state
+    const streamingStartTime = Date.now();
+    let lastChunkTime = Date.now();
+    let lastScrollTime = 0;
+    const SCROLL_THROTTLE_MS = 150; // Throttle scroll updates
+    
+    // Scroll handler function with throttling
+    const maybeScroll = () => {
+      const now = Date.now();
+      if (now - lastScrollTime > SCROLL_THROTTLE_MS) {
+        lastScrollTime = now;
+        if (chatContainerRef.current) {
+          chatContainerRef.current.scrollTo({
+            top: chatContainerRef.current.scrollHeight,
+            behavior: 'smooth'
+          });
+        }
+      }
+    };
+    
+    // Initial scroll to ensure we're at the bottom when starting
+    setTimeout(() => {
+      if (chatContainerRef.current) {
+        chatContainerRef.current.scrollTo({
+          top: chatContainerRef.current.scrollHeight,
+          behavior: 'auto'
+        });
+      }
+    }, 100);
+    
     // Cleanup function
     const cleanup = () => {
       isStreaming = false;
       if (abortControllerRef.current === abortController) {
         abortControllerRef.current = null;
       }
+      if (scrollInterval) {
+        clearInterval(scrollInterval);
+      }
       setIsLoading(false);
     };
-
-    // Auto-scroll to bottom when new content arrives
-    const scrollToBottom = () => {
-      if (chatContainerRef.current) {
-        chatContainerRef.current.scrollTo({
-          top: chatContainerRef.current.scrollHeight,
-          behavior: 'smooth'
-        });
-      }
-    };
-
-    // Scroll to bottom when streaming starts
-    setTimeout(scrollToBottom, 100);
     
-
     try {
       const modelName = AVAILABLE_MODELS.find(m => m.id === selectedModel)?.name || 'AI Assistant';
       const stream = openRouter.streamMessage(
@@ -235,57 +270,68 @@ const Index = () => {
         modelName,
         abortController.signal
       );
-
-      // Add scroll handler for streaming updates
-      scrollInterval = setInterval(scrollToBottom, 500);
-      let lastChunkTime = Date.now();
-
-      // Process the stream chunks
-      for await (const chunk of stream) {
+    
+    // Process the stream chunks
+    for await (const chunk of stream) {
         if (!isStreaming) break;
         if (chunk.error) throw new Error(chunk.error);
         if (chunk.done) break;
         
-        // Update the full response
+        // Update the full response and track last chunk time
         fullResponse += chunk.content;
         lastChunkTime = Date.now();
         
-        // Throttle UI updates
-        const now = Date.now();
-        if (now - lastUpdateTime > UPDATE_THROTTLE_MS) {
-          lastUpdateTime = now;
+        // Update state in a more efficient way
+        setCurrentChat(prev => {
+          if (!prev) return prev;
           
-          // Use functional update to avoid race conditions
-          setCurrentChat(prev => {
-            if (!prev) return prev;
-            
-            const messageIndex = prev.messages.findIndex(m => m.id === assistantMessageId);
-            if (messageIndex === -1) return prev;
-            
-            // Skip if content hasn't changed (shouldn't happen but good to check)
-            const currentContent = prev.messages[messageIndex]?.content || '';
-            if (currentContent === fullResponse) return prev;
-            
-            // Create a new messages array with updated content
+          const messageIndex = prev.messages.findIndex(m => m.id === assistantMessageId);
+          if (messageIndex === -1) return prev;
+          
+          // Skip if content hasn't changed
+          const currentContent = prev.messages[messageIndex]?.content || '';
+          if (currentContent === fullResponse) return prev;
+          
+          // Only update if we have new content
+          if (currentContent.length < fullResponse.length) {
+            // Use a more efficient update by only changing what's necessary
             const newMessages = [...prev.messages];
             newMessages[messageIndex] = {
               ...newMessages[messageIndex],
               content: fullResponse,
-              timestamp: now,
+              timestamp: Date.now(),
               isStreaming: true
             };
+            
+            // Only trigger scroll for significant updates to reduce jank
+            if (fullResponse.length % 10 === 0 || fullResponse.length < 50) {
+              maybeScroll();
+            }
             
             return {
               ...prev,
               messages: newMessages,
-              updatedAt: now
+              updatedAt: Date.now(),
+              // Prevent unnecessary re-renders
+              ...(prev.updatedAt ? {} : { updatedAt: Date.now() })
             };
-          });
-        }
+          }
+          
+          return prev;
+        });
+        
+        // Add a small delay to prevent UI thread blocking
+        await new Promise(resolve => setTimeout(resolve, 0));
       }
 
       // Final update when streaming is complete
       if (isStreaming && !hasError) {
+        // Force a final update with requestAnimationFrame to ensure it runs in the next tick
+        await new Promise(resolve => requestAnimationFrame(resolve));
+        
+        // Make sure we have the latest fullResponse
+        const finalResponse = fullResponse;
+        
         setCurrentChat(prev => {
           if (!prev) return prev;
           
@@ -294,15 +340,15 @@ const Index = () => {
           
           // Skip if already up to date
           const currentMessage = prev.messages[messageIndex];
-          if (currentMessage.content === fullResponse && currentMessage.isStreaming === false) {
+          if (currentMessage.content === finalResponse && currentMessage.isStreaming === false) {
             return prev;
           }
           
-          // Create final messages array
+          // Create final messages array with the complete response
           const finalMessages = [...prev.messages];
           finalMessages[messageIndex] = {
             ...finalMessages[messageIndex],
-            content: fullResponse,
+            content: finalResponse,  // Use the captured finalResponse
             isStreaming: false,
             timestamp: Date.now()
           };
@@ -324,6 +370,9 @@ const Index = () => {
           
           return finalChat;
         });
+        
+        // Force a re-render to ensure the UI is updated
+        await new Promise(resolve => setTimeout(resolve, 0));
       }
     } catch (error) {
       hasError = true;
