@@ -1,8 +1,7 @@
-
 import { useState, useEffect, useRef } from 'react';
 import { ChevronDown, Check, Sparkles } from 'lucide-react';
 import { AVAILABLE_MODELS } from '@/lib/models';
-import { useTheme } from '@/hooks/useTheme';
+import { useTheme } from 'next-themes';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface ModelSelectorProps {
@@ -18,7 +17,7 @@ export const ModelSelector = ({
 }: ModelSelectorProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
-  const { resolvedTheme } = useTheme();
+  const { theme } = useTheme();
   const dropdownRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
 
