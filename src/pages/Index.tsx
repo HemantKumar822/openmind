@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useTheme } from '@/hooks/useTheme';
 import { motion } from 'framer-motion';
@@ -453,7 +452,7 @@ const Index = () => {
   const showWelcomeScreen = !currentChat || currentChat.messages.length === 0;
 
   return (
-    <div className="min-h-screen flex flex-col bg-white dark:bg-black w-full antialiased">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-gray-50 via-white to-blue-50/30 dark:from-gray-950 dark:via-gray-900 dark:to-blue-950/20 w-full antialiased">
       <div className="flex-1 flex flex-col w-full max-w-screen-2xl mx-auto">
         <Header
           selectedModel={selectedModel}
@@ -466,46 +465,55 @@ const Index = () => {
         />
         
         {/* Chat area with proper height and scrolling */}
-        <main className="flex-1 flex flex-col w-full min-h-0">
+        <main className="flex-1 flex flex-col w-full min-h-0 relative">
           {showWelcomeScreen ? (
             <WelcomeScreen />
           ) : (
-            <div
+            <motion.div
               ref={chatContainerRef}
-              className="flex-1 w-full overflow-y-auto scrollbar-thin"
+              className="flex-1 w-full overflow-y-auto scrollbar-thin relative"
               style={{
                 height: 'calc(100vh - 140px)', // Account for header and input
                 scrollBehavior: 'smooth',
                 WebkitOverflowScrolling: 'touch',
               }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.3 }}
             >
-              <div className="w-full max-w-4xl mx-auto px-3 sm:px-4 lg:px-6 py-4 sm:py-6">
-                <div className="space-y-4 sm:space-y-6 w-full">
-                  {currentChat?.messages.map((message) => (
-                    <div key={message.id} className="w-full">
+              {/* Chat Messages */}
+              <div className="w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+                <div className="space-y-6 sm:space-y-8 w-full">
+                  {currentChat?.messages.map((message, index) => (
+                    <motion.div 
+                      key={message.id} 
+                      className="w-full"
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.4, delay: index * 0.1 }}
+                    >
                       <ChatMessage message={message} />
-                    </div>
+                    </motion.div>
                   ))}
                 </div>
                 {/* Bottom padding for better scroll experience */}
-                <div className="h-16 sm:h-20 w-full" />
+                <div className="h-24 w-full" />
               </div>
-            </div>
+
+              {/* Gradient Overlay at Bottom */}
+              <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-white/80 via-white/40 to-transparent dark:from-black/80 dark:via-black/40 dark:to-transparent pointer-events-none"></div>
+            </motion.div>
           )}
         </main>
 
-        {/* Sticky chat input at bottom */}
-        <div className="sticky bottom-0 z-20 bg-white/95 dark:bg-black/95 backdrop-blur-sm border-t border-gray-200/60 dark:border-gray-700/60">
-          <div className="w-full max-w-4xl mx-auto px-3 sm:px-4 lg:px-6 py-3 sm:py-4">
-            <ChatInput
-              onSendMessage={handleSendMessage}
-              onStopGeneration={handleStopGeneration}
-              disabled={isLoading}
-              isStreaming={isLoading}
-              placeholder={hasMessages ? "Continue the conversation..." : "Start your conversation with OpenMind..."}
-            />
-          </div>
-        </div>
+        {/* Enhanced Chat Input */}
+        <ChatInput
+          onSendMessage={handleSendMessage}
+          onStopGeneration={handleStopGeneration}
+          disabled={isLoading}
+          isStreaming={isLoading}
+          placeholder={hasMessages ? "Continue the conversation..." : "Start your conversation with OpenMind..."}
+        />
       </div>
     </div>
   );

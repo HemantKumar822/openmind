@@ -1,7 +1,8 @@
 
 import { useState, KeyboardEvent, useRef, useEffect } from 'react';
-import { Send, Loader2, X } from 'lucide-react';
+import { Send, Loader2, Square, Sparkles, Mic } from 'lucide-react';
 import { Textarea } from '@/components/ui/textarea';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface ChatInputProps {
   onSendMessage: (message: string) => void;
@@ -16,9 +17,10 @@ export const ChatInput = ({
   onStopGeneration,
   disabled = false,
   isStreaming = false,
-  placeholder = "Type your message..."
+  placeholder = "Ask anything..."
 }: ChatInputProps) => {
   const [message, setMessage] = useState('');
+  const [isFocused, setIsFocused] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   // Auto-resize textarea
@@ -27,7 +29,7 @@ export const ChatInput = ({
       textareaRef.current.style.height = 'auto';
       textareaRef.current.style.height = `${Math.min(
         textareaRef.current.scrollHeight,
-        180 // max height in pixels
+        200 // max height in pixels
       )}px`;
     }
   }, [message]);
@@ -46,73 +48,171 @@ export const ChatInput = ({
     }
   };
 
+  const suggestions = [
+    "Explain quantum computing",
+    "Write a creative story",
+    "Help with coding",
+    "Plan a trip"
+  ];
+
   return (
-    <div className="w-full border-t border-gray-200 dark:border-gray-800 bg-white/80 dark:bg-black/80 p-2 sm:p-4 sticky bottom-0 backdrop-blur-sm">
-      <div className="relative w-full max-w-4xl mx-auto">
-        <Textarea
-          ref={textareaRef}
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-          onKeyDown={handleKeyDown}
-          placeholder={disabled ? "OpenMind is thinking..." : "Ask anything..."}
-          disabled={disabled}
-          className="w-full min-h-[48px] sm:min-h-[56px] max-h-[200px] sm:max-h-[280px] resize-none border-2 border-gray-200 dark:border-gray-700 text-base sm:text-[15.5px] rounded-2xl shadow-sm bg-white dark:bg-gray-900/80 pl-4 sm:pl-5 pr-12 sm:pr-14 py-3 font-medium placeholder:text-gray-500/60 dark:placeholder:text-gray-500/70 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500/50 transition-all duration-200 ease-in-out backdrop-blur-sm overflow-y-auto overscroll-contain [&::-webkit-scrollbar]:hidden"
-          style={{
-            // For better mobile experience with virtual keyboards
-            WebkitAppearance: 'none',
-            appearance: 'none',
-            lineHeight: '1.5',
-            // Hide scrollbar for all browsers
-            scrollbarWidth: 'none', // Firefox
-            msOverflowStyle: 'none', // IE and Edge
-            WebkitOverflowScrolling: 'touch', // Smooth scrolling on iOS
-          }}
-          rows={1}
-        />
-        {isStreaming ? (
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              onStopGeneration?.();
-            }}
-            className="absolute right-2 top-1/2 -translate-y-1/2 bg-gradient-to-br from-red-500 to-red-700 text-white p-2 rounded-full hover:opacity-90 transition-opacity flex items-center justify-center z-10 overflow-hidden shadow-sm"
-            title="Stop generating"
+    <div className="w-full bg-gradient-to-t from-white/95 via-white/90 to-transparent dark:from-black/95 dark:via-black/90 dark:to-transparent backdrop-blur-xl border-t border-gray-200/60 dark:border-gray-700/60 sticky bottom-0 z-20">
+      {/* Quick Suggestions */}
+      <AnimatePresence>
+        {!message && !isFocused && (
+          <motion.div
+            className="px-4 pt-4 pb-2"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.3 }}
           >
-            <div className="relative w-4 h-4 flex items-center justify-center">
-              <div className="absolute w-3 h-3 bg-white rounded-sm" 
-                   style={{
-                     animation: 'pulse 1.5s ease-in-out infinite',
-                     boxShadow: '0 0 0 0 rgba(255, 255, 255, 0.7)'
-                   }}>
+            <div className="max-w-4xl mx-auto">
+              <div className="flex items-center space-x-2 mb-3">
+                <Sparkles className="h-4 w-4 text-blue-500" />
+                <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                  Try these suggestions
+                </span>
               </div>
-              <style>
-                {`
-                  @keyframes pulse {
-                    0%, 100% { opacity: 1; transform: scale(1); }
-                    50% { opacity: 0.6; transform: scale(0.9); }
-                  }
-                `}
-              </style>
+              <div className="flex flex-wrap gap-2">
+                {suggestions.map((suggestion, index) => (
+                  <motion.button
+                    key={suggestion}
+                    onClick={() => setMessage(suggestion)}
+                    className="px-3 py-1.5 text-sm bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200 border border-gray-200 dark:border-gray-700"
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: index * 0.1, duration: 0.2 }}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    {suggestion}
+                  </motion.button>
+                ))}
+              </div>
             </div>
-          </button>
-        ) : (
-          <button
-            type="button"
-            onClick={handleSend}
-            disabled={disabled || !message.trim()}
-            className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-full focus:outline-none disabled:opacity-50 z-10"
-            aria-label="Send message"
-          >
-            {disabled ? (
-              <Loader2 className="h-5 w-5 text-primary-500 animate-spin" />
-            ) : (
-              <div className="bg-gradient-to-br from-blue-600 to-blue-800 text-white p-1.5 rounded-full hover:opacity-90 transition-opacity shadow-sm">
-                <Send className="h-4 w-4" />
-              </div>
-            )}
-          </button>
+          </motion.div>
         )}
+      </AnimatePresence>
+
+      {/* Main Input Area */}
+      <div className="px-4 pb-4 pt-2">
+        <div className="w-full max-w-4xl mx-auto">
+          <motion.div 
+            className={`relative rounded-2xl transition-all duration-300 ${
+              isFocused 
+                ? 'shadow-lg shadow-blue-500/10 ring-2 ring-blue-500/20' 
+                : 'shadow-md hover:shadow-lg'
+            }`}
+            layout
+          >
+            {/* Gradient Border Effect */}
+            <div className="absolute inset-0 bg-gradient-to-r from-blue-500 via-purple-500 to-blue-500 rounded-2xl p-[1px] opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+              <div className="w-full h-full bg-white dark:bg-gray-900 rounded-2xl"></div>
+            </div>
+            
+            <div className="relative bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm border border-gray-200 dark:border-gray-700 rounded-2xl overflow-hidden">
+              <Textarea
+                ref={textareaRef}
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                onKeyDown={handleKeyDown}
+                onFocus={() => setIsFocused(true)}
+                onBlur={() => setIsFocused(false)}
+                placeholder={disabled ? "OpenMind is thinking..." : placeholder}
+                disabled={disabled}
+                className="w-full min-h-[60px] max-h-[200px] resize-none border-0 bg-transparent text-base px-6 py-4 pr-20 placeholder:text-gray-500/70 dark:placeholder:text-gray-400/70 focus:outline-none focus:ring-0 focus-visible:ring-0 transition-all duration-200"
+                style={{
+                  scrollbarWidth: 'none',
+                  msOverflowStyle: 'none',
+                  WebkitOverflowScrolling: 'touch',
+                }}
+                rows={1}
+              />
+              
+              {/* Action Buttons */}
+              <div className="absolute right-3 bottom-3 flex items-center space-x-2">
+                {/* Voice Input Button (placeholder) */}
+                <motion.button
+                  type="button"
+                  className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors duration-200 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800"
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  title="Voice input (coming soon)"
+                >
+                  <Mic className="h-4 w-4" />
+                </motion.button>
+
+                {/* Send/Stop Button */}
+                <AnimatePresence mode="wait">
+                  {isStreaming ? (
+                    <motion.button
+                      key="stop"
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onStopGeneration?.();
+                      }}
+                      className="p-2.5 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-xl hover:from-red-600 hover:to-red-700 transition-all duration-200 shadow-lg hover:shadow-xl flex items-center justify-center group"
+                      initial={{ opacity: 0, scale: 0.8, rotate: -180 }}
+                      animate={{ opacity: 1, scale: 1, rotate: 0 }}
+                      exit={{ opacity: 0, scale: 0.8, rotate: 180 }}
+                      transition={{ duration: 0.2 }}
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      title="Stop generating"
+                    >
+                      <Square className="h-4 w-4 fill-current" />
+                    </motion.button>
+                  ) : (
+                    <motion.button
+                      key="send"
+                      type="button"
+                      onClick={handleSend}
+                      disabled={disabled || !message.trim()}
+                      className={`p-2.5 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl flex items-center justify-center group ${
+                        message.trim() && !disabled
+                          ? 'bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white'
+                          : 'bg-gray-200 dark:bg-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed'
+                      }`}
+                      initial={{ opacity: 0, scale: 0.8, rotate: 180 }}
+                      animate={{ opacity: 1, scale: 1, rotate: 0 }}
+                      exit={{ opacity: 0, scale: 0.8, rotate: -180 }}
+                      transition={{ duration: 0.2 }}
+                      whileHover={message.trim() && !disabled ? { scale: 1.05 } : {}}
+                      whileTap={message.trim() && !disabled ? { scale: 0.95 } : {}}
+                      title="Send message"
+                    >
+                      {disabled ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <Send className="h-4 w-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform duration-200" />
+                      )}
+                    </motion.button>
+                  )}
+                </AnimatePresence>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Character Count & Tips */}
+          <AnimatePresence>
+            {(isFocused || message.length > 0) && (
+              <motion.div
+                className="flex items-center justify-between mt-3 px-2 text-xs text-gray-500 dark:text-gray-400"
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.2 }}
+              >
+                <span>Press Shift + Enter for new line</span>
+                <span className={message.length > 4000 ? 'text-orange-500' : ''}>
+                  {message.length}/5000
+                </span>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
       </div>
     </div>
   );
