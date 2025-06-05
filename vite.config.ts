@@ -29,10 +29,16 @@ export default defineConfig(({ mode }) => ({
     },
   },
   esbuild: {
-    logOverride: { 'this-is-undefined-in-esm': 'silent' }
+    logOverride: { 'this-is-undefined-in-esm': 'silent' },
+    tsconfigRaw: {
+      compilerOptions: {
+        declaration: false,
+        declarationMap: false,
+        emitDeclarationOnly: false,
+      }
+    }
   },
   define: {
-    // Ensure proper environment variables
     'process.env': {}
   },
   optimizeDeps: {
