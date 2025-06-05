@@ -21,6 +21,7 @@ const Index = () => {
   const toggleTheme = useCallback(() => {
     setTheme(theme === 'dark' ? 'light' : 'dark');
   }, [theme, setTheme]);
+  
   const [selectedModel, setSelectedModel] = useState<string>(
     storageUtils.getSelectedModel() || AVAILABLE_MODELS[0].id
   );
@@ -452,8 +453,8 @@ const Index = () => {
   const showWelcomeScreen = !currentChat || currentChat.messages.length === 0;
 
   return (
-    <div className="min-h-screen flex flex-col bg-white dark:bg-black w-full">
-      <div className="flex-1 flex flex-col w-full max-w-[2000px] mx-auto">
+    <div className="min-h-screen flex flex-col bg-white dark:bg-black w-full antialiased">
+      <div className="flex-1 flex flex-col w-full max-w-screen-2xl mx-auto">
         <Header
           selectedModel={selectedModel}
           onModelChange={handleModelChange}
@@ -464,39 +465,38 @@ const Index = () => {
           onConversationChange={handleConversationChange}
         />
         
-        {/* Chat area with fixed height and scrolling */}
-        <main className="flex-1 flex flex-col w-full">
+        {/* Chat area with proper height and scrolling */}
+        <main className="flex-1 flex flex-col w-full min-h-0">
           {showWelcomeScreen ? (
             <WelcomeScreen />
           ) : (
             <div
               ref={chatContainerRef}
-              className="flex-1 w-full overflow-y-auto scrollbar-thin scrollbar-thumb-openmind-border/30 scrollbar-track-transparent hover:scrollbar-thumb-openmind-border/50"
+              className="flex-1 w-full overflow-y-auto scrollbar-thin"
               style={{
-                height: 'calc(100vh - 4rem - 4.5rem)', // Account for header and input heights
+                height: 'calc(100vh - 140px)', // Account for header and input
                 scrollBehavior: 'smooth',
-                scrollPadding: '1rem',
                 WebkitOverflowScrolling: 'touch',
               }}
             >
-              <div className="w-full max-w-4xl mx-auto px-2 sm:px-4 lg:px-6 py-4">
-                <div className="space-y-2 sm:space-y-3 w-full">
+              <div className="w-full max-w-4xl mx-auto px-3 sm:px-4 lg:px-6 py-4 sm:py-6">
+                <div className="space-y-4 sm:space-y-6 w-full">
                   {currentChat?.messages.map((message) => (
                     <div key={message.id} className="w-full">
                       <ChatMessage message={message} />
                     </div>
                   ))}
                 </div>
-                {/* Empty space at the bottom to prevent content from being hidden behind the input */}
-                <div className="h-24 sm:h-20 w-full" />
+                {/* Bottom padding for better scroll experience */}
+                <div className="h-16 sm:h-20 w-full" />
               </div>
             </div>
           )}
         </main>
 
-        {/* Fixed chat input at bottom */}
-        <div className="sticky bottom-0 z-10 bg-white/80 dark:bg-black/80 backdrop-blur-sm">
-          <div className="w-full max-w-4xl mx-auto px-2 sm:px-4 lg:px-6">
+        {/* Sticky chat input at bottom */}
+        <div className="sticky bottom-0 z-20 bg-white/95 dark:bg-black/95 backdrop-blur-sm border-t border-gray-200/60 dark:border-gray-700/60">
+          <div className="w-full max-w-4xl mx-auto px-3 sm:px-4 lg:px-6 py-3 sm:py-4">
             <ChatInput
               onSendMessage={handleSendMessage}
               onStopGeneration={handleStopGeneration}
